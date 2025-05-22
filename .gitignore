@@ -1,0 +1,52 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log*
+
+# Build output
+dist/
+build/
+tmp/
+temp/
+.cache/
+.next/
+out/
+coverage/
+public/build/
+
+# Environment files
+.env
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# MongoDB data dumps
+dump/
+*.mongodb
+
+# Misc
+*.tgz
+*.gz
+
+# React Native (if used)
+.expo/
+*.expo
+
+#custom file
+handle.js
