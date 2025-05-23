@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Eye, EyeOff, HeartPulse, User, Stethoscope } from "lucide-react";
-import "../index.css";
-import { useLogin } from "../hooks/auth"; // Import useLogin hook
+import { Eye, EyeOff, User, Stethoscope } from "lucide-react";
+import "@/index.css";
+import { useLogin } from "@/hooks/auth"; // Import useLogin hook
+import Logo from "@/components/Logo";
 
 const formSchema = z.object({
   email: z.string().email("Must be a valid email"),
@@ -44,9 +45,7 @@ const Login = () => {
       { credentials: values, loginType },
       {
         onSuccess: () => {
-          toast.success(
-            "Account created successfully. Redirecting to login..."
-          );
+          toast.success("Logged-In! successfully. Redirecting to login...");
           navigate("/");
         },
         onError: (error) => {
@@ -63,10 +62,7 @@ const Login = () => {
         style={{ backgroundImage: `url("../../aiH.jpg")` }}
         className="relative hidden h-full bg-cover bg-center flex-col bg-muted p-10 text-white dark:border-r lg:flex"
       >
-        <div className="relative z-20 flex items-center gap-2 text-lg font-bold primary-grad">
-          <HeartPulse className="h-6 w-6" />
-          MediQly
-        </div>
+        <Logo />
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">

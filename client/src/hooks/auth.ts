@@ -21,7 +21,7 @@ export const getToken = () => {
 
 // Register User & Store Token
 const registerUser = async (userData: any) => {
-  const { data } = await axios.post(`${BASE_URL}/users/register`, userData);
+  const { data } = await axios.post(`${BASE_URL}/user/register`, userData);
   setAuthData(data.token, "user");
   return data;
 };
@@ -30,8 +30,8 @@ const registerUser = async (userData: any) => {
 const login = async ({ credentials, loginType }: any) => {
   const endpoint =
     loginType === "doctor"
-      ? `${BASE_URL}/doctors/login`
-      : `${BASE_URL}/users/login`;
+      ? `${BASE_URL}/doctor/login`
+      : `${BASE_URL}/user/login`;
 
   const { data } = await axios.post(endpoint, credentials);
   setAuthData(data.token, loginType);
@@ -115,7 +115,7 @@ const registerDoctor = async (userData: any) => {
   };
   console.log(formattedData, "ahhah");
   const { data } = await axios.post(
-    `${BASE_URL}/doctors/register`,
+    `${BASE_URL}/doctor/register`,
     formattedData
   );
   setAuthData(data.token, "doctor");

@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     queryFn: async () => {
       if (!token || userType !== "user") return null;
       try {
-        const { data } = await api.get("/users/profile");
+        const { data } = await api.get("/user/profile");
         return data;
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     queryFn: async () => {
       if (!token || userType !== "doctor") return null;
       try {
-        const { data } = await api.get("/doctors/profile");
+        const { data } = await api.get("/doctor/profile");
         return data;
       } catch (error) {
         console.error("Error fetching doctor profile:", error);
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       );
 
       if (!token && !isPublicRoute) {
-        navigate("/login");
+        // navigate("/login");
       } else if (token && !isAuthenticated && !isLoading) {
         // If we have a token but no user data, try to fetch it again
         if (userType === "doctor") {

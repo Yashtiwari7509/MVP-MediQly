@@ -4,17 +4,8 @@ interface UserProps {
   email: string;
   _id: string;
 }
-interface cardsProps {
-  title: string;
-  value: string;
-  trend: string;
-  icon: undefined;
-  trendDirection: undefined;
-}
-type locationProp = {
-  coordinates: [number, number];
-};
-interface profileProps {
+
+interface userProfileProps {
   _id?: string;
   firstName: string;
   lastName: string;
@@ -22,19 +13,6 @@ interface profileProps {
   phoneNumber?: string;
   dob?: string;
   gender?: string;
-  isOnline?: boolean;
-  location?: locationProp;
 }
 
-interface doctorProfileProps {
-  _id?:string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber?: string;
-  isOnline?: boolean;
-  location?: locationProp;
-  specialization?: string;
-  experience? : number;
-}
-export type { UserProps, cardsProps, profileProps, doctorProfileProps };
+export type { UserProps, userProfileProps };

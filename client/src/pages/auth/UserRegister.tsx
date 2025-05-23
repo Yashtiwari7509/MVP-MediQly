@@ -21,9 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { HeartPulse, Eye, EyeOff } from "lucide-react";
-import "../index.css";
+import { Eye, EyeOff } from "lucide-react";
+import "@/index.css";
 import { useRegister } from "@/hooks/auth";
+import Logo from "@/components/Logo";
 
 const formSchema = z.object({
   email: z.string().email("Must be a valid email"),
@@ -49,7 +50,6 @@ const formSchema = z.object({
   }),
 });
 
-
 const UserRegister = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -71,7 +71,7 @@ const UserRegister = () => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     userRegister.mutate(values, {
       onSuccess: () => {
-        toast.success("Account created successfully. Redirecting to login...");
+        toast.success("User created successfully. Redirecting to login...");
         navigate("/");
       },
       onError: (error: any) => {
@@ -86,10 +86,7 @@ const UserRegister = () => {
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="auth-Image relative hidden h-full flex-col bg-cover bg-center bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0" />
-        <div className="relative z-20 flex items-center gap-2 text-lg font-bold">
-          <HeartPulse className="h-6 w-6" />
-          MediQly
-        </div>
+        <Logo />
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">

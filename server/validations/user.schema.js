@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const registerSchema = z.object({
+export const registerUserSchema = z.object({
   email: z.string().email("Must be a valid email"),
   password: z.string().min(4, "Password must be at least 4 characters long"),
   firstName: z
@@ -20,7 +20,7 @@ export const registerSchema = z.object({
   gender: z.enum(["Male", "Female", "Other"]),
 });
 
-export const loginSchema = z.object({
+export const loginUserSchema = z.object({
   email: z.string().email("Must be a valid email"),
   password: z.string().min(2, "Password is required"),
 });

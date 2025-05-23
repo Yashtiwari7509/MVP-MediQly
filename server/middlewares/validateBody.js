@@ -1,5 +1,5 @@
-export const validate = (schema) => (req, res, next) => {
-  console.log(req.body,'ehllo');
+const validateReq = (schema) => (req, res, next) => {
+  console.log(req.body, "ehllo");
 
   const result = schema.safeParse(req.body);
   console.log(result);
@@ -16,3 +16,4 @@ export const validate = (schema) => (req, res, next) => {
   req.body = result.data;
   next();
 };
+export default validateReq;

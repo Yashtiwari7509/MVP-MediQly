@@ -8,9 +8,11 @@ import connectToDb from "./configs/dbConnect.js";
 
 // ROUTES
 import userRoute from "./routes/user.route.js";
+import doctorRoute from "./routes/doctor.route.js";
+
 dotenv.config();
 
-// connectToDb();
+connectToDb();
 
 const app = express();
 
@@ -21,7 +23,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(compression());
 
+//route handlers
 app.use("/user", userRoute);
+app.use("/doctor", doctorRoute);
+
+//mock route for testing
 app.get("/", (req, res) => {
   res.send({ message: "hello from yash" });
 });
