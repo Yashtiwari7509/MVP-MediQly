@@ -10,7 +10,7 @@ import connectToDb from "./configs/dbConnect.js";
 import userRoute from "./routes/user.route.js";
 dotenv.config();
 
-// connectToDb();
+connectToDb();
 
 const app = express();
 
