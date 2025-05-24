@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken } from "../hooks/auth"; // Import function to get stored token
+import { getToken } from "../hooks/use-auth"; // Import function to get stored token
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
 // Create an Axios instance

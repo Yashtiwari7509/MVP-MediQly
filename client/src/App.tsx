@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/index.css";
 import Login from "@/pages/auth/Login";
@@ -5,7 +6,7 @@ import UserRegister from "@/pages/auth/UserRegister";
 import DocRegister from "@/pages/auth/DocRegister";
 import Index from "@/pages/dashboard";
 import { AuthProvider } from "@/provider/AuthProvider";
-import AiDoctor from "./pages/chat";
+import PaymentsPage from "@/pages/payments";
 
 function App() {
   return (
@@ -24,11 +25,13 @@ function App() {
             </AuthProvider>
           }
         />
+        
+        {/* Add Payments Route */}
         <Route
-          path="/chat"
+          path="/payments"
           element={
             <AuthProvider>
-              <AiDoctor />
+              <PaymentsPage />
             </AuthProvider>
           }
         />

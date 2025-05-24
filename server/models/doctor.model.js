@@ -80,17 +80,3 @@ DoctorSchema.statics.hashPassword = async function (password) {
 
 export default mongoose.model("Doctor", DoctorSchema);
 
-// // Hash Password before saving
-// DoctorSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) {
-//     return next();
-//   }
-//   try {
-//     this.password = await bcrypt.hash(this.password, 10);
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-// DoctorSchema.index({ location: "2dsphere" });

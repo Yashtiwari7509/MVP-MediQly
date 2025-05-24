@@ -1,14 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, Calendar, Activity } from "lucide-react";
+import { Home, User, Calendar, Activity, IndianRupee } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect } from "react";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
-  { icon: Calendar, label: "Appointments", path: "/appointments" },
-  { icon: Activity, label: "Health", path: "/health-tracker" },
-  { icon: User, label: "Profile", path: "/profile" },
+  { icon: IndianRupee, label: "Payments", path: "/payments" },
+  { icon: Activity, label: "Health", path: "/" },
+  { icon: User, label: "Profile", path: "/p" },
 ];
 
 export function Navigation() {

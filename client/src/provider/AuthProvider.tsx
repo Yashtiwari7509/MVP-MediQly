@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useLocation } from "react-router-dom"; // 🔹 Added `useLocation`
 import api from "@/utils/api";
-import { getToken, getUserType } from "@/hooks/auth";
+import { getToken, getUserType } from "@/hooks/use-auth";
 import type { profileProps, doctorProfileProps } from "@/lib/user.type";
 import "@/App.css";
 

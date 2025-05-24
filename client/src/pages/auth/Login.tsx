@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Eye, EyeOff, User, Stethoscope } from "lucide-react";
 import "@/index.css";
-import { useLogin } from "@/hooks/auth"; // Import useLogin hook
+import { useLogin } from "@/hooks/use-auth"; // Import useLogin hook
 import Logo from "@/components/Logo";
 
 const formSchema = z.object({
@@ -49,6 +49,8 @@ const Login = () => {
           navigate("/");
         },
         onError: (error) => {
+          console.log(error);
+
           toast.error((error as any).response.data.message);
         },
       }

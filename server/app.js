@@ -1,3 +1,4 @@
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -9,6 +10,7 @@ import connectToDb from "./configs/dbConnect.js";
 // ROUTES
 import userRoute from "./routes/user.route.js";
 import doctorRoute from "./routes/doctor.route.js";
+import paymentRoute from "./routes/payment.route.js"; // Add this line
 
 dotenv.config();
 
@@ -26,6 +28,7 @@ app.use(compression());
 //route handlers
 app.use("/user", userRoute);
 app.use("/doctor", doctorRoute);
+app.use("/payment", paymentRoute); // Add this line
 
 //mock route for testing
 app.get("/", (req, res) => {

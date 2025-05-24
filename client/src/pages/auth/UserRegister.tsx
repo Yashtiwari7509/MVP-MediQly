@@ -23,7 +23,7 @@ import {
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import "@/index.css";
-import { useRegister } from "@/hooks/auth";
+import { useRegister } from "@/hooks/use-auth";
 import Logo from "@/components/Logo";
 
 const formSchema = z.object({

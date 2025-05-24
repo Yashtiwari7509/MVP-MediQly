@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/provider/ThemeProvider";
-import { useLogout } from "@/hooks/auth";
+import { useLogout } from "@/hooks/use-auth";
 import { useAuth } from "@/provider/AuthProvider";
 import { Navigation } from "./Navigation";
 import { toast } from "sonner";
@@ -32,8 +32,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const logoutFun = useLogout();
 
   const toggleTheme = () => {
-    console.log(theme);
-
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
@@ -53,16 +51,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto md:ml-64">
-        <div className="border-b bg-background">
-          <div className="container flex h-16 items-center px-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="mr-2 md:hidden"
-              // onClick={toggleSidebar}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
+        <div className="border-b w-full fixed right-0 top-0 bg-background z-40">
+          <div className="container  flex h-16 items-center px-4">
             <div className="ml-auto  flex items-center gap-4">
               <Button
                 className="rounded-full"
@@ -129,9 +119,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
           </div>
         </div>
-        <div className="container mx-auto p-6 pb-20 md:pb-6">{children}</div>
-        <Navigation />
+        <div className="container mx-auto mt-20 p-6 pb-20 md:pb-6">
+          {children}
+        </div>
       </main>
+      <Navigation />
       {/* <VoiceNavigation />
       <OfflineIndicator /> */}
     </div>

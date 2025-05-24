@@ -205,7 +205,7 @@
 
 @media (max-width: 768px) {
   .sidebar-open {
-    transform: translateX(0);
+    transform: translateX(100%);
   }
 
   .sidebar-open + #sidebar-overlay {

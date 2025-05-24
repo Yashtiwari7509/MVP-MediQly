@@ -22,7 +22,7 @@ import {
 import { toast } from "sonner";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDocRegister } from "@/hooks/auth";
+import { useDocRegister } from "@/hooks/use-auth";
 import Logo from "@/components/Logo";
 
 const formSchema = z.object({
