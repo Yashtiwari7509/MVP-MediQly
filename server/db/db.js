@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-
+import dotenv from "dotenv";
+dotenv.config();
 let isConnected = false;
 
 async function connectToDb() {
@@ -37,17 +38,16 @@ async function connectToDb() {
     });
 
     // Handle process termination
-    process.on('SIGINT', async () => {
+    process.on("SIGINT", async () => {
       try {
         await mongoose.connection.close();
-        console.log('MongoDB connection closed through app termination');
+        console.log("MongoDB connection closed through app termination");
         process.exit(0);
       } catch (err) {
-        console.error('Error closing MongoDB connection:', err);
+        console.error("Error closing MongoDB connection:", err);
         process.exit(1);
       }
     });
-
   } catch (error) {
     console.error("Database connection error:", error.message);
     isConnected = false;

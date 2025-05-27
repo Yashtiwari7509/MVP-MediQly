@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef } from "react";
-import io, { Socket } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/auth/AuthProvider";
 
 interface SocketContextType {
@@ -47,4 +47,4 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </SocketContext.Provider>
   );
-}; 
+};
