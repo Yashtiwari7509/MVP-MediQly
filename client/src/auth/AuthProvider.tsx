@@ -3,7 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useLocation } from "react-router-dom"; // 🔹 Added `useLocation`
 import api from "@/utils/api";
 import { getToken, getUserType } from "@/hooks/auth";
-import type { profileProps, doctorProfileProps } from "@/lib/user.type";
+import { profileProps, doctorProfileProps } from "@/lib/user.type";
+import { LoaderIcon } from "lucide-react";
 import "@/App.css";
 
 interface AuthContextType {
@@ -15,7 +16,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,7 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   // 🔹 Compute Authentication State
-  const isLoading = !!token && (isUserLoading || isDoctorLoading);
+  const isLoading = (!!token && (isUserLoading || isDoctorLoading));
   const isAuthenticated = useMemo(
     () => !!(currentUser || currentDoctor),
     [currentUser, currentDoctor]
@@ -96,15 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
     }
-  }, [
-    isLoading,
-    isAuthenticated,
-    navigate,
-    token,
-    location.pathname,
-    userType,
-    queryClient,
-  ]);
+  }, [isLoading, isAuthenticated, navigate, token, location.pathname, userType, queryClient]);
 
   // 🔹 Show Loading While Fetching Initial Data
   if (isLoading) {

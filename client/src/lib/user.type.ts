@@ -1,3 +1,5 @@
+import { Coordinate } from "recharts/types/util/types";
+
 interface UserProps {
   firstName: string;
   lastName: string;

@@ -1,3 +1,4 @@
+import api from "@/utils/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -21,26 +22,29 @@ export const getToken = () => {
 
 // Register User & Store Token
 const registerUser = async (userData: any) => {
-  const { data } = await axios.post(`${BASE_URL}/users/register`, userData);
+  const { data } = await axios.post(
+    `${BASE_URL}/api/users/register`,
+    userData
+  );
   setAuthData(data.token, "user");
   return data;
 };
 
 // 🔹 Dynamic Login Function (Supports User & Doctor)
-const login = async ({ credentials, loginType }: any) => {
+const login = async ({ credentials, loginType }) => {
   const endpoint =
     loginType === "doctor"
-      ? `${BASE_URL}/doctors/login`
-      : `${BASE_URL}/users/login`;
+      ? `${BASE_URL}/api/doctors/login`
+      : `${BASE_URL}/api/users/login`;
 
   const { data } = await axios.post(endpoint, credentials);
   setAuthData(data.token, loginType);
-
+  
   // Return data in a consistent format
   return {
     token: data.token,
     user: loginType === "user" ? data.user : null,
-    doctor: loginType === "doctor" ? data.doctor : null,
+    doctor: loginType === "doctor" ? data.doctor : null
   };
 };
 
@@ -62,14 +66,14 @@ export const useLogin = () => {
       // Clear both user and doctor data first
       queryClient.setQueryData(["currentUser"], null);
       queryClient.setQueryData(["currentDoctor"], null);
-
+      
       // Then set the appropriate data
       if (variables.loginType === "doctor") {
         queryClient.setQueryData(["currentDoctor"], data.doctor);
       } else {
         queryClient.setQueryData(["currentUser"], data.user);
       }
-
+      
       // Force a refetch of the profile
       if (variables.loginType === "doctor") {
         queryClient.invalidateQueries({ queryKey: ["currentDoctor"] });
@@ -107,15 +111,15 @@ export const useLogout = () => {
 
 // doctor register
 
-const registerDoctor = async (userData: any) => {
+const registerDoctor = async (userData) => {
   const formattedData = {
     ...userData,
-    qualifications: userData.qualifications.filter((q: any) => q.trim() !== ""),
+    qualifications: userData.qualifications.filter((q) => q.trim() !== ""),
     experience: parseInt(userData.experience, 10),
   };
   console.log(formattedData, "ahhah");
   const { data } = await axios.post(
-    `${BASE_URL}/doctors/register`,
+    `${BASE_URL}/api/doctors/register`,
     formattedData
   );
   setAuthData(data.token, "doctor");

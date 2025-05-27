@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, HeartPulse, User, Stethoscope } from "lucide-react";
 import "../index.css";
 import { useLogin } from "../hooks/auth"; // Import useLogin hook
@@ -24,6 +24,7 @@ const formSchema = z.object({
 });
 
 const Login = () => {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState<"user" | "doctor">("user"); // New: Toggle between User & Doctor
@@ -44,20 +45,28 @@ const Login = () => {
       { credentials: values, loginType },
       {
         onSuccess: () => {
-          toast.success(
-            "Account created successfully. Redirecting to login..."
-          );
+          toast({
+            title: "Success",
+            description: `${
+              loginType === "user" ? "User" : "Doctor"
+            } logged in successfully. Redirecting...`,
+          });
           navigate("/");
         },
         onError: (error) => {
-          toast.error((error as any).response.data.message);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description:
+              (error as any)?.response?.data.message || "Login failed",
+          });
         },
       }
     );
   };
 
   return (
-    <div className="container  relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       {/* Left Side with Background */}
       <div
         style={{ backgroundImage: `url("../../aiH.jpg")` }}
@@ -180,7 +189,7 @@ const Login = () => {
           <div className="text-center text-sm text-muted-foreground">
             Don't have an account?
             <Link
-              to={loginType === "user" ? "/user-register" : "/doc-register"}
+              to={loginType === "user" ? "/register" : "/doc-register"}
               className="underline underline-offset-4 hover:text-primary"
             >
               Sign up as a {loginType}

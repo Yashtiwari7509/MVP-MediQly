@@ -19,7 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDocRegister } from "@/hooks/auth";
@@ -52,12 +54,14 @@ const formSchema = z.object({
     "General Practitioner",
     "Other",
   ]),
-  experience: z.coerce.number().min(0, "Experience must be a positive number"),
+  experience: z
+    .preprocess((val) => Number(val), z.number().min(0, "Experience must be a positive number")),
   qualifications: z.array(
     z.string().min(2, "Qualification must be at least 2 characters long")
   ),
 });
-const DocRegister = () => {
+const Register = () => {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [qualifications, setQualifications] = useState([""]);
@@ -92,25 +96,30 @@ const DocRegister = () => {
     setQualifications([...qualifications, ""]);
   };
 
-  const removeQualification = (index: any) => {
+  const removeQualification = (index) => {
     const newQualifications = qualifications.filter((_, i) => i !== index);
     setQualifications(newQualifications);
   };
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     docRegister.mutate(values as any, {
       onSuccess: () => {
-        toast.success(
-          "Doctor account created successfully. Redirecting to login..."
-        );
+        toast({
+          title: "Success",
+          description:
+            "Doctor account created successfully. Redirecting to login...",
+        });
         navigate("/");
       },
       onError: (error) => {
         console.log(error);
-        toast.error(
-          (error as any).response?.data[0]?.message ||
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description:
+            (error as any).response?.data[0]?.message ||
             (error as any).response?.data?.message ||
-            "Registration failed"
-        );
+            "Registration failed",
+        });
       },
     });
   };
@@ -375,4 +384,4 @@ const DocRegister = () => {
   );
 };
 
-export default DocRegister;
+export default Register;
