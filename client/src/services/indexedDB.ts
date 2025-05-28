@@ -67,7 +67,7 @@ export class OfflineStorage {
         healthMetricsStore.createIndex('by-timestamp', 'timestamp');
 
         const offlineActionsStore = db.createObjectStore('offlineActions', { keyPath: 'id' });
-        offlineActionsStore.createIndex('by-synced', 'synced');
+        offlineActionsStore.createIndex('by-synced', 'synced', { unique: false });
       },
     });
   }

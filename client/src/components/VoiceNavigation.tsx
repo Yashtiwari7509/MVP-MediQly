@@ -15,7 +15,7 @@ import {
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { useToast } from '@/hooks/use-toast';
-import axios from 'axios';
+import { Groq } from 'groq-sdk';
 import { useAuth } from '@/auth/AuthProvider';
 import '../styles/animations.css';
 
@@ -48,6 +48,8 @@ interface CommandPattern {
   parameters?: Record<string, any>;
   contextRequired?: boolean;
   confidence: number;
+  category: 'navigation' | 'data' | 'action' | 'system';
+  description: string;
 }
 
 interface Intent {
@@ -114,6 +116,12 @@ const AVAILABLE_ROUTES = {
     name: 'Chat with Doctor',
     aliases: ['chat', 'doctor chat', 'message doctor', 'chat with doctor', 'doctor consultation'],
     description: 'Chat with a healthcare professional'
+  },
+  '/diet-plan': {
+    path: '/diet-plan',
+    name: 'Diet Plan',
+    aliases: ['diet', 'meal plan', 'nutrition', 'food plan', 'diet plan', 'meal planning', 'nutrition plan'],
+    description: 'Personalized diet and nutrition planning'
   }
 } as const;
 
@@ -198,7 +206,7 @@ const VoiceNavigation: React.FC = () => {
   // Fetch latest fitness data
   const fetchLatestFitnessData = async () => {
     try {
-      const response = await axios.get(
+      const response = await fetch(
         `${API_BASE_URL}/api/fitness-data/latest`,
         {
           headers: {
@@ -206,8 +214,9 @@ const VoiceNavigation: React.FC = () => {
           }
         }
       );
-      setFitnessData(response.data);
-      return response.data;
+      const data = await response.json();
+      setFitnessData(data);
+      return data;
     } catch (error) {
       console.error('Error fetching fitness data:', error);
       return null;
@@ -224,7 +233,9 @@ const VoiceNavigation: React.FC = () => {
       ],
       action: 'navigate',
       parameters: { path: '/' },
-      confidence: 0.9
+      confidence: 0.9,
+      category: 'navigation',
+      description: 'navigate to the main dashboard'
     },
     {
       patterns: [
@@ -233,7 +244,9 @@ const VoiceNavigation: React.FC = () => {
       ],
       action: 'navigate',
       parameters: { path: '/health-tracker' },
-      confidence: 0.9
+      confidence: 0.9,
+      category: 'navigation',
+      description: 'navigate to the health tracker'
     },
     {
       patterns: [
@@ -242,7 +255,9 @@ const VoiceNavigation: React.FC = () => {
       ],
       action: 'navigate',
       parameters: { path: '/consultation' },
-      confidence: 0.9
+      confidence: 0.9,
+      category: 'navigation',
+      description: 'navigate to the consultation'
     },
     // Data query patterns
     {
@@ -252,7 +267,9 @@ const VoiceNavigation: React.FC = () => {
       ],
       action: 'queryData',
       parameters: { dataType: 'steps' },
-      confidence: 0.85
+      confidence: 0.85,
+      category: 'data',
+      description: 'query steps data'
     },
     {
       patterns: [
@@ -261,7 +278,9 @@ const VoiceNavigation: React.FC = () => {
       ],
       action: 'queryData',
       parameters: { dataType: 'calories' },
-      confidence: 0.85
+      confidence: 0.85,
+      category: 'data',
+      description: 'query calories data'
     },
     {
       patterns: [
@@ -270,7 +289,9 @@ const VoiceNavigation: React.FC = () => {
       ],
       action: 'queryData',
       parameters: { dataType: 'activeMinutes' },
-      confidence: 0.85
+      confidence: 0.85,
+      category: 'data',
+      description: 'query active minutes data'
     },
     // Tab switching patterns
     {
@@ -281,7 +302,9 @@ const VoiceNavigation: React.FC = () => {
       action: 'switchTab',
       parameters: { tab: 'charts' },
       contextRequired: true,
-      confidence: 0.8
+      confidence: 0.8,
+      category: 'action',
+      description: 'switch to the charts tab'
     },
     {
       patterns: [
@@ -291,7 +314,9 @@ const VoiceNavigation: React.FC = () => {
       action: 'switchTab',
       parameters: { tab: 'overview' },
       contextRequired: true,
-      confidence: 0.8
+      confidence: 0.8,
+      category: 'action',
+      description: 'switch to the overview tab'
     },
     // System commands
     {
@@ -302,7 +327,9 @@ const VoiceNavigation: React.FC = () => {
       ],
       action: 'system',
       parameters: { command: 'help' },
-      confidence: 0.95
+      confidence: 0.95,
+      category: 'system',
+      description: 'show available commands'
     },
     {
       patterns: [
@@ -311,331 +338,30 @@ const VoiceNavigation: React.FC = () => {
       ],
       action: 'system',
       parameters: { command: 'back' },
-      confidence: 0.9
+      confidence: 0.9,
+      category: 'system',
+      description: 'go back to the previous page'
     }
   ], []);
 
-  const classifyIntent = (text: string): Intent => {
-    // Normalize text
-    const normalizedText = text.toLowerCase().trim();
-    const words = normalizedText.split(/\s+/);
-    
-    // Common words for different intents
-    const navigationWords = ['go', 'take', 'show', 'open', 'navigate', 'view', 'see', 'display'];
-    const queryWords = ['how', 'what', 'tell', 'check', 'get', 'find', 'show'];
-    const actionWords = ['switch', 'change', 'update', 'set', 'turn', 'enable', 'disable'];
-    const systemWords = ['help', 'back', 'return', 'close', 'exit'];
-
-    // Extract potential entities
-    const entities: Record<string, string> = {};
-    
-    // Look for page/section references
-    if (normalizedText.includes('dashboard') || normalizedText.includes('home')) {
-      entities.page = '/';
-    } else if (normalizedText.includes('health-tracker') || normalizedText.includes('health')) {
-      entities.page = '/health-tracker';
-    } else if (normalizedText.includes('consultation') || normalizedText.includes('consult')) {
-      entities.page = '/consultation';
-    }
-
-    // Look for data types
-    if (normalizedText.includes('step')) {
-      entities.dataType = 'steps';
-    } else if (normalizedText.includes('calorie')) {
-      entities.dataType = 'calories';
-    } else if (normalizedText.includes('active') || normalizedText.includes('activity')) {
-      entities.dataType = 'activeMinutes';
-    } else if (normalizedText.includes('distance') || normalizedText.includes('walked')) {
-      entities.dataType = 'distance';
-    }
-
-    // Look for view types
-    if (normalizedText.includes('chart') || normalizedText.includes('graph') || normalizedText.includes('analytics')) {
-      entities.view = 'charts';
-    } else if (normalizedText.includes('overview') || normalizedText.includes('summary')) {
-      entities.view = 'overview';
-    }
-
-    // Calculate intent scores
-    let scores = {
-      navigation: 0,
-      query: 0,
-      action: 0,
-      system: 0
-    };
-
-    // Score based on intent words
-    words.forEach(word => {
-      if (navigationWords.includes(word)) scores.navigation += 0.3;
-      if (queryWords.includes(word)) scores.query += 0.3;
-      if (actionWords.includes(word)) scores.action += 0.3;
-      if (systemWords.includes(word)) scores.system += 0.3;
-    });
-
-    // Score based on entities
-    if (entities.page) scores.navigation += 0.4;
-    if (entities.dataType) scores.query += 0.4;
-    if (entities.view) scores.action += 0.4;
-
-    // Get the highest scoring intent
-    const intentScores = Object.entries(scores);
-    intentScores.sort(([, a], [, b]) => b - a);
-    const [topIntent, topScore] = intentScores[0];
-
-    return {
-      type: topIntent as Intent['type'],
-      confidence: topScore,
-      entities
-    };
-  };
-
-  const analyzeNavigationIntent = (text: string): { path: string; confidence: number } | null => {
-    const normalizedText = text.toLowerCase().trim();
-    const words = normalizedText.split(/\s+/);
-    
-    // Score each page based on matching keywords and context
-    const pageScores = pageContexts.map(page => {
-      let score = 0;
-      
-      // Check for exact keyword matches
-      page.keywords.forEach(keyword => {
-        if (normalizedText.includes(keyword)) score += 0.4;
-      });
-
-      // Check for synonym matches
-      page.synonyms.forEach(synonym => {
-        if (normalizedText.includes(synonym)) score += 0.3;
-      });
-
-      // Check for contextual hints
-      page.contextualHints.forEach(hint => {
-        if (normalizedText.includes(hint)) score += 0.2;
-      });
-
-      // Check for semantic similarity using word proximity
-      let proximityScore = 0;
-      words.forEach((word, index) => {
-        // Check if this word is a keyword or synonym
-        const isRelevant = [...page.keywords, ...page.synonyms].some(k => k.includes(word));
-        if (isRelevant) {
-          // Look at surrounding words for contextual hints
-          const context = words.slice(Math.max(0, index - 2), index + 3);
-          page.contextualHints.forEach(hint => {
-            if (context.some(w => hint.includes(w))) proximityScore += 0.1;
-          });
-        }
-      });
-      score += proximityScore;
-
-      // Boost score based on current context
-      if (location.pathname === page.path) {
-        score *= 0.8; // Reduce likelihood of navigating to current page
-      }
-
-      // Boost score for navigation-indicating phrases
-      const navigationPhrases = [
-        'take me to', 'go to', 'navigate to', 'show me', 'open', 'want to see',
-        'looking for', 'need to check', 'can you show', 'where is'
-      ];
-      navigationPhrases.forEach(phrase => {
-        if (normalizedText.includes(phrase)) score += 0.2;
-      });
-
-      return { path: page.path, score };
-    });
-
-    // Get the highest scoring page
-    pageScores.sort((a, b) => b.score - a.score);
-    const bestMatch = pageScores[0];
-
-    // Return the result if confidence is high enough
-    return bestMatch.score > 0.3 ? { path: bestMatch.path, confidence: bestMatch.score } : null;
-  };
-
-  const processSemanticCommand = (text: string): SemanticContext => {
-    // Normalize and clean the input
-    const normalizedText = text.toLowerCase().trim();
-    
-    // Extract semantic meaning
-    const semanticPatterns = {
-      navigation: [
-        { pattern: /(take|bring|show|go|navigate|move|head|direct).*?(to|into|towards|at)/i, weight: 0.8 },
-        { pattern: /(open|access|visit|view|see|check|find)/i, weight: 0.6 },
-        { pattern: /(where|location|page|screen|section)/i, weight: 0.5 },
-        { pattern: /(back|return|previous|last)/i, weight: 0.7 }
-      ],
-      query: [
-        { pattern: /(how|what|when|tell|show|display).*(many|much|long|status|progress)/i, weight: 0.8 },
-        { pattern: /(check|see|view|get|fetch|find).*(data|info|stats|numbers|metrics)/i, weight: 0.7 },
-        { pattern: /(my|current|today|now|latest).*(steps|calories|activity|distance)/i, weight: 0.9 }
-      ],
-      action: [
-        { pattern: /(switch|change|toggle|flip|move).*(to|between|into)/i, weight: 0.8 },
-        { pattern: /(show|display|view).*(chart|graph|analytics|overview|summary)/i, weight: 0.7 },
-        { pattern: /(update|modify|edit|set|adjust)/i, weight: 0.6 }
-      ],
-      system: [
-        { pattern: /(help|assist|guide|support|explain)/i, weight: 0.9 },
-        { pattern: /(close|exit|quit|end|stop)/i, weight: 0.8 },
-        { pattern: /(settings|preferences|options|config)/i, weight: 0.7 }
-      ]
-    };
-
-    // Calculate intent scores
-    const intentScores = Object.entries(semanticPatterns).map(([intent, patterns]) => {
-      let score = 0;
-      patterns.forEach(({ pattern, weight }) => {
-        if (pattern.test(normalizedText)) {
-          score += weight;
-        }
-      });
-      return { intent, score };
-    });
-
-    // Find primary intent
-    intentScores.sort((a, b) => b.score - a.score);
-    const primaryIntent = intentScores[0];
-
-    // Extract entities based on intent
-    const entities: Record<string, any> = {};
-    
-    // Location entities
-    const locationMatch = normalizedText.match(/(to|at|in|on)\s+(?:the\s+)?([a-z\s]+?)(?:\s+(?:page|screen|section|dashboard))?(?:\s+|$)/i);
-    if (locationMatch) {
-      entities.location = locationMatch[2].trim();
-    }
-
-    // Data type entities
-    const dataTypes = ['steps', 'calories', 'activity', 'distance', 'health', 'fitness'];
-    dataTypes.forEach(type => {
-      if (normalizedText.includes(type)) {
-        entities.dataType = type;
-      }
-    });
-
-    // Time context
-    const timePatterns = {
-      current: /(now|current|present|moment)/i,
-      today: /(today|this day)/i,
-      week: /(this week|weekly|past 7 days)/i,
-      month: /(this month|monthly|past 30 days)/i
-    };
-
-    Object.entries(timePatterns).forEach(([timeContext, pattern]) => {
-      if (pattern.test(normalizedText)) {
-        entities.timeContext = timeContext;
-      }
-    });
-
-    // Build context from current state and history
-    const context = {
-      currentPath: location.pathname,
-      previousCommands: conversationHistory.current.slice(-3),
-      userType,
-      hasFitnessData: !!fitnessData,
-      timeOfDay: new Date().getHours(),
-      activeTab
-    };
-
-    // Update conversation history
-    conversationHistory.current = [...conversationHistory.current.slice(-5), normalizedText];
-
-    // Calculate final confidence score
-    const confidence = Math.min(
-      (primaryIntent.score +
-        (Object.keys(entities).length * 0.2) +
-        (context.previousCommands.length * 0.1)
-      ) / 2,
-      1
-    );
-
-    return {
-      intent: primaryIntent.intent,
-      entities,
-      confidence,
-      context
-    };
-  };
-
-  const executeSemanticAction = async (semanticContext: SemanticContext) => {
-    const { intent, entities, confidence, context } = semanticContext;
-    
-    if (confidence < 0.3) {
-      return {
-        success: false,
-        feedback: "I'm not quite sure what you want to do. Could you be more specific?",
-        action: null
-      };
-    }
-
-    // Handle navigation intent
-    if (intent === 'navigation') {
-      const targetPath = determineTargetPath(entities.location, context);
-      if (targetPath && targetPath !== location.pathname) {
-        return {
-          success: true,
-          feedback: `Taking you to ${getPageDescription(targetPath)}`,
-          action: () => navigate(targetPath)
-        };
-      }
-    }
-
-    // Handle query intent
-    if (intent === 'query' && entities.dataType) {
-      const data = await fetchLatestFitnessData();
-      if (data) {
-        const response = formatDataResponse(entities.dataType, data, entities.timeContext);
-        return {
-          success: true,
-          feedback: response,
-          action: null
-        };
-      }
-    }
-
-    // Handle action intent
-    if (intent === 'action' && context.currentPath === '/health-tracker') {
-      const view = determineViewType(entities);
-      if (view) {
-        return {
-          success: true,
-          feedback: `Switching to ${view} view`,
-          action: () => window.dispatchEvent(new CustomEvent('switchGoogleFitTab', { detail: view }))
-        };
-      }
-    }
-
-    // Handle system intent
-    if (intent === 'system') {
-      if (normalizedText.includes('help')) {
-        return {
-          success: true,
-          feedback: 'Showing available commands',
-          action: () => setShowHelp(true)
-        };
-      }
-      if (normalizedText.includes('back')) {
-        return {
-          success: true,
-          feedback: 'Going back to previous page',
-          action: () => navigate(-1)
-        };
-      }
-    }
-
-    return {
-      success: false,
-      feedback: "I understood your request but I'm not sure how to help with that",
-      action: null
-    };
-  };
+  const groq = new Groq({
+    apiKey: import.meta.env.VITE_GROQ_API_KEY,
+    dangerouslyAllowBrowser: true
+  });
 
   const determineTargetPath = (location: string, context: any): string | null => {
     if (!location) return null;
     
-    const normalizedLocation = location.toLowerCase();
+    const normalizedLocation = location.toLowerCase().trim();
     
-    // Check direct path matches
+    // First check for exact matches
+    for (const route of Object.values(AVAILABLE_ROUTES)) {
+      if (route.aliases.some(alias => normalizedLocation === alias)) {
+        return route.path;
+      }
+    }
+    
+    // Then check for partial matches
     for (const route of Object.values(AVAILABLE_ROUTES)) {
       if (route.aliases.some(alias => normalizedLocation.includes(alias))) {
         return route.path;
@@ -696,25 +422,57 @@ const VoiceNavigation: React.FC = () => {
         availableRoutes: Object.keys(AVAILABLE_ROUTES)
       };
 
-      const response = await axios.post(
-        `${API_BASE_URL}/api/ai/process-command`,
-        {
-          command,
-          currentPath: location.pathname,
-          userContext
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `You are a voice command processor for a healthcare application. 
+            Available routes: ${JSON.stringify(AVAILABLE_ROUTES)}.
+            Current path: ${location.pathname}.
+            User context: ${JSON.stringify(userContext)}.
+            
+            IMPORTANT: You must respond with ONLY a valid JSON object, no other text or explanation.
+            The JSON must follow this exact structure:
+            {
+              "intent": "navigation" | "query" | "action" | "system",
+              "action": string,
+              "targetPath": string | null,
+              "parameters": object | null,
+              "confidence": number,
+              "response": string
+            }
+            
+            Example valid response:
+            {"intent":"navigation","action":"navigate","targetPath":"/health-tracker","parameters":null,"confidence":0.9,"response":"Navigating to Health Tracker"}`
+          },
+          {
+            role: "user",
+            content: command
           }
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.1,
+        max_tokens: 1024,
+        response_format: { type: "json_object" }
+      });
+
+      let result;
+      try {
+        const content = completion.choices[0]?.message?.content;
+        if (!content) {
+          throw new Error('No response from AI model');
         }
-      );
-
-      const result = response.data;
-
-      if (result.error) {
-        throw new Error(result.error);
+        result = JSON.parse(content);
+      } catch (error) {
+        console.error('Error parsing AI response:', error);
+        setFeedback("I'm having trouble understanding the command. Please try again.");
+        toast({
+          title: "Error Processing Command",
+          description: "The AI response was not in the expected format. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        return;
       }
 
       if (result.confidence > 0.3) {
@@ -723,7 +481,11 @@ const VoiceNavigation: React.FC = () => {
         // Handle navigation with route validation and success toast
         if (result.intent === 'navigation' && result.targetPath) {
           if (!isValidRoute(result.targetPath)) {
-            setFeedback("I'm sorry, that page is not available.");
+            const availableRoutes = Object.values(AVAILABLE_ROUTES)
+              .map(route => route.name.toLowerCase())
+              .join(', ');
+            
+            setFeedback(`I'm sorry, that page is not available. Available pages are: ${availableRoutes}`);
             toast({
               title: "Navigation Error",
               description: "The requested page is not available in this application.",
@@ -734,13 +496,15 @@ const VoiceNavigation: React.FC = () => {
 
           if (result.targetPath !== location.pathname) {
             navigate(result.targetPath);
-            setFeedback(`Navigating to ${getPageDescription(result.targetPath)}`);
-            // Add success toast for navigation
+            const pageName = getPageDescription(result.targetPath);
+            setFeedback(`Navigating to ${pageName}`);
             toast({
               title: "Navigation Successful",
-              description: `Navigated to ${getPageDescription(result.targetPath)}`,
+              description: `Navigated to ${pageName}`,
               variant: "default",
             });
+          } else {
+            setFeedback(`You are already on the ${getPageDescription(result.targetPath)} page`);
           }
         }
 
@@ -752,7 +516,6 @@ const VoiceNavigation: React.FC = () => {
               setFeedback(formatDataResponse(result.parameters.metric || 'steps', data, result.parameters.timeRange || 'today'));
             }
           } else if (result.action === 'viewProgress') {
-            // Handle progress view
             if (result.targetPath && result.targetPath !== location.pathname) {
               navigate(result.targetPath);
             }
@@ -813,38 +576,95 @@ const VoiceNavigation: React.FC = () => {
     } catch (error: any) {
       console.error('Error processing command:', error);
       
-      // Extract the most relevant error message
       let errorMessage = 'An error occurred while processing your request.';
-      if (error.response?.data?.details) {
-        errorMessage = error.response.data.details;
-      } else if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      } else if (error.message) {
+      if (error.message) {
         errorMessage = error.message;
       }
 
-      // Set user-friendly feedback
       setFeedback(`Sorry, I couldn't process that command. ${errorMessage}`);
       
-      // Show toast with more detailed error
       toast({
         title: "Error Processing Command",
         description: errorMessage,
         variant: "destructive",
         duration: 5000,
       });
-
-      // If it's an authentication error, we might want to handle it specially
-      if (error.response?.status === 401) {
-        toast({
-          title: "Authentication Error",
-          description: "Please log in again to continue using voice commands.",
-          variant: "destructive",
-          duration: 7000,
-        });
-      }
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleRecognitionError = (error: string) => {
+    console.log('Recognition error:', error);
+    
+    // Don't show error for intentional stops
+    if (error === 'aborted' || error === 'no-speech') {
+      setIsListening(false);
+      setFeedback('');
+      return;
+    }
+
+    setIsListening(false);
+    let errorMessage = 'An error occurred. Please try again.';
+    
+    switch (error) {
+      case 'network':
+        errorMessage = 'Network error. Please check your connection.';
+        break;
+      case 'audio-capture':
+        errorMessage = 'No microphone detected.';
+        break;
+      case 'not-allowed':
+        errorMessage = 'Microphone access denied.';
+        break;
+      case 'service-not-allowed':
+        errorMessage = 'Speech recognition service is not available.';
+        break;
+      case 'bad-grammar':
+      case 'language-not-supported':
+        errorMessage = 'Language not supported.';
+        break;
+    }
+
+    setFeedback(errorMessage);
+    toast({
+      title: "Error",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
+
+  // Modify button handlers for click instead of hold
+  const handleButtonClick = () => {
+    if (!isListening && recognitionRef.current) {
+      setIsOpen(true);
+      try {
+        // Reset any previous state
+        setTranscript('');
+        setFeedback('');
+        setIsProcessing(false);
+        
+        // Start recognition with error handling
+        recognitionRef.current.start();
+      } catch (error) {
+        console.error('Failed to start recognition:', error);
+        handleRecognitionError('service-not-allowed');
+      }
+    } else if (isListening && recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (error) {
+        console.error('Error stopping recognition:', error);
+      } finally {
+        setIsOpen(false);
+        setTranscript('');
+        setFeedback('');
+        setIsListening(false);
+        if (visualizerInterval.current) {
+          clearInterval(visualizerInterval.current);
+          setVisualizerData(Array(10).fill(0.2));
+        }
+      }
     }
   };
 
@@ -875,11 +695,14 @@ const VoiceNavigation: React.FC = () => {
       };
 
       recognition.onend = () => {
-        setIsListening(false);
-        // Stop voice visualizer
-        if (visualizerInterval.current) {
-          clearInterval(visualizerInterval.current);
-          setVisualizerData(Array(10).fill(0.2));
+        // Only reset if we're not intentionally stopping
+        if (isListening) {
+          setIsListening(false);
+          // Stop voice visualizer
+          if (visualizerInterval.current) {
+            clearInterval(visualizerInterval.current);
+            setVisualizerData(Array(10).fill(0.2));
+          }
         }
       };
 
@@ -911,29 +734,6 @@ const VoiceNavigation: React.FC = () => {
     }
   }, []);
 
-  // Modify button handlers for click instead of hold
-  const handleButtonClick = () => {
-    if (!isListening && recognitionRef.current) {
-      setIsOpen(true);
-      try {
-        recognitionRef.current.start();
-      } catch (error) {
-        console.error('Failed to start recognition:', error);
-        handleRecognitionError('aborted');
-      }
-    } else if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsOpen(false);
-      setTranscript('');
-      setFeedback('');
-      setIsListening(false);
-      if (visualizerInterval.current) {
-        clearInterval(visualizerInterval.current);
-        setVisualizerData(Array(10).fill(0.2));
-      }
-    }
-  };
-
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -957,37 +757,6 @@ const VoiceNavigation: React.FC = () => {
       }
     };
   }, [initializeSpeechRecognition]);
-
-  const handleRecognitionError = (error: string) => {
-    setIsListening(false);
-    let errorMessage = 'An error occurred. Please try again.';
-    
-    switch (error) {
-      case 'network':
-        errorMessage = 'Network error. Please check your connection.';
-        break;
-      case 'no-speech':
-        errorMessage = 'No speech detected. Please try again.';
-        break;
-      case 'audio-capture':
-        errorMessage = 'No microphone detected.';
-        break;
-      case 'not-allowed':
-        errorMessage = 'Microphone access denied.';
-        break;
-      case 'aborted':
-        // Don't show toast for cancelled listening
-        setFeedback('');
-        return;
-    }
-
-    setFeedback(errorMessage);
-    toast({
-      title: "Error",
-      description: errorMessage,
-      variant: "destructive",
-    });
-  };
 
   if (isSupported === false) return null;
 

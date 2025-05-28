@@ -1,5 +1,6 @@
 import "regenerator-runtime/runtime";
 import { useRef, useEffect, useState } from "react";
+import Groq from "groq-sdk";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ import {
 import { cn } from "@/lib/utils";
 import MainLayout from "@/components/layout/MainLayout";
 import { useSpeechRecognition } from 'react-speech-kit';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface Language {
   code: string;
@@ -248,14 +250,73 @@ const AiDoctor = () => {
     },
     onError: (error: Error) => {
       console.error('Speech recognition error:', error);
-      toast.error(
-        currentLanguage.code === 'en'
-          ? "Failed to recognize speech. Please try again."
-          : "Error al reconocer el habla. Por favor, inténtelo de nuevo."
-      );
+      
+      // Handle specific error types
+      const errorMessage = error instanceof Error ? error.message : '';
+      let userMessage = '';
+      
+      if (errorMessage.includes('network')) {
+        userMessage = currentLanguage.code === 'en' 
+          ? "Network error: Please check your internet connection and try again."
+          : currentLanguage.code === 'es'
+          ? "Error de red: Por favor, verifique su conexión a internet e inténtelo de nuevo."
+          : currentLanguage.code === 'hi'
+          ? "नेटवर्क त्रुटि: कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।"
+          : currentLanguage.code === 'ar'
+          ? "خطأ في الشبكة: يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى."
+          : currentLanguage.code === 'zh'
+          ? "网络错误：请检查您的网络连接并重试。"
+          : "Network error: Please check your internet connection and try again.";
+      } else if (errorMessage.includes('not-allowed')) {
+        userMessage = currentLanguage.code === 'en'
+          ? "Microphone access denied. Please allow microphone access in your browser settings."
+          : currentLanguage.code === 'es'
+          ? "Acceso al micrófono denegado. Por favor, permita el acceso al micrófono en la configuración de su navegador."
+          : currentLanguage.code === 'hi'
+          ? "माइक्रोफोन एक्सेस अस्वीकृत। कृपया अपनी ब्राउ़र सेटिंग्स में माइक्रोफोन एक्सेस की अनुमति दें।"
+          : currentLanguage.code === 'ar'
+          ? "تم رفض الوصول إلى الميكروفون. يرجى السماح بالوصول إلى الميكروفون في إعدادات المتصفح."
+          : currentLanguage.code === 'zh'
+          ? "麦克风访问被拒绝。请在浏览器设置中允许麦克风访问。"
+          : "Microphone access denied. Please allow microphone access in your browser settings.";
+      } else {
+        userMessage = currentLanguage.code === 'en'
+          ? "Speech recognition failed. Please try again or type your message."
+          : currentLanguage.code === 'es'
+          ? "El reconocimiento de voz falló. Por favor, inténtelo de nuevo o escriba su mensaje."
+          : currentLanguage.code === 'hi'
+          ? "स्पीच रिकग्निशन विफल। कृपया पुनः प्रयास करें या अपना संदेश टाइप करें।"
+          : currentLanguage.code === 'ar'
+          ? "فشل التعرف على الكلام. يرجى المحاولة مرة أخرى أو كتابة رسالتك."
+          : currentLanguage.code === 'zh'
+          ? "语音识别失败。请重试或输入您的消息。"
+          : "Speech recognition failed. Please try again or type your message.";
+      }
+
+      toast.error(userMessage, {
+        duration: 5000,
+        action: {
+          label: currentLanguage.code === 'en' ? "Try Again" :
+                 currentLanguage.code === 'es' ? "Intentar de nuevo" :
+                 currentLanguage.code === 'hi' ? "पुनः प्रयास करें" :
+                 currentLanguage.code === 'ar' ? "حاول مرة اخرى" :
+                 currentLanguage.code === 'zh' ? "重试" :
+                 "Try Again",
+          onClick: () => {
+            stopRecording();
+            setTimeout(() => {
+              startRecording();
+            }, 1000);
+          }
+        }
+      });
+      
       stopRecording();
     }
   });
+
+  // Initialize Gemini API
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -305,16 +366,19 @@ const AiDoctor = () => {
           Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "mistral-saba-24b",
+          model: "llama-3.3-70b-versatile",
           messages: [
             {
               role: "system",
-              content: `You are a medical translator. Translate the following text to ${targetLang} while preserving medical terminology and emojis. Keep the translation simple and easy to understand.`,
+              content: `You are a medical translator. Translate the following text to ${targetLang} while preserving medical terminology and emojis. Keep the translation simple and easy to understand. Maintain the original formatting and structure.`,
             },
             { role: "user", content: text },
           ],
           temperature: 0.3,
-          max_tokens: 1000,
+          max_tokens: 2048,
+          top_p: 0.9,
+          stream: false,
+          safe_mode: true,
         }),
       });
 
@@ -426,28 +490,24 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
         content: msg.content
       }));
 
+      // Initialize Groq client
+      const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY ,dangerouslyAllowBrowser: true });
+
       // Start the API call
-      const responsePromise = fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "mistral-saba-24b",
-          messages: [
-            systemMessage,
-            ...contextMessages,
-            {
-              role: "user",
-              content: input
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 1024,
-          stop: null,
-          n: 1
-        })
+      const responsePromise = groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          systemMessage,
+          ...contextMessages,
+          {
+            role: "user",
+            content: input
+          }
+        ],
+        temperature: 0.5,
+          max_tokens: 2048,
+          top_p: 0.9,
+          stream: false
       });
 
       // Create a delay promise for minimum animation time (8 seconds)
@@ -456,14 +516,11 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
       // Wait for both the API response and the minimum delay
       const [response] = await Promise.all([responsePromise, delayPromise]);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error?.message || `API request failed with status ${response.status}`
-        );
+      if (!response?.choices?.[0]?.message?.content) {
+        throw new Error('Invalid response format from API');
       }
 
-      const data = await response.json();
+      const data = response;
       
       if (!data?.choices?.[0]?.message?.content) {
         throw new Error('Invalid response format from API');
@@ -584,37 +641,29 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
         content: msg.content
       }));
 
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "mistral-saba-24b",
-          messages: [
-            systemMessage,
-            ...contextMessages,
-            {
-              role: "user",
-              content: `Please analyze these symptoms and provide a simple explanation in ${currentLanguage.name}:\n\n${symptomsText}\n${reportText}`
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 1024,
-          stop: null,
-          n: 1
-        })
+      const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY, dangerouslyAllowBrowser: true });
+
+      const response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          systemMessage,
+          ...contextMessages,
+          {
+            role: "user",
+            content: `Please analyze these symptoms and provide a simple explanation in ${currentLanguage.name}:\n\n${symptomsText}\n${reportText}`
+          }
+        ],
+        temperature: 0.5,
+        max_tokens: 2048,
+        top_p: 0.9,
+        stream: false
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error?.message || `API request failed with status ${response.status}`
-        );
+      if (!response?.choices?.[0]?.message?.content) {
+        throw new Error('Invalid response format from API');
       }
 
-      const data = await response.json();
+      const data = response;
       
       if (!data?.choices?.[0]?.message?.content) {
         throw new Error('Invalid response format from API');
@@ -658,48 +707,81 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
     }
   };
 
-  const handleFileUpload = async (file: File) => {
-    setIsProcessingFile(true);
-    setUploadedFile(file);
-
+  // Function to process file with Gemini
+  const processFileWithGemini = async (file: File) => {
     try {
+      setIsProcessingFile(true);
+      
+      // For PDF files
       if (file.type === 'application/pdf') {
-        // For PDF files, we'll use pdf.js to extract text
         const reader = new FileReader();
         reader.onload = async (e) => {
           try {
-            // Note: In a production environment, you would want to process this on the server
-            // For now, we'll just read it as text
-            const text = await extractTextFromPDF(e.target?.result as ArrayBuffer);
-            setReportText(text);
+            const arrayBuffer = e.target?.result as ArrayBuffer;
+            const text = await extractTextFromPDF(arrayBuffer);
+            
+            // Process text with Gemini
+            const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+            const prompt = `Analyze this medical report and provide a summary in ${currentLanguage.name}:\n\n${text}`;
+            
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const summary = response.text();
+            
+            setReportText(summary);
+            toast.success('Report processed successfully');
           } catch (error) {
             console.error('Error processing PDF:', error);
-            toast.error('Failed to process PDF file. Please try copying the text manually.');
+            toast.error('Failed to process PDF file');
           }
         };
         reader.readAsArrayBuffer(file);
-      } else if (file.type.startsWith('image/')) {
-        // For images, we'll use Tesseract.js for OCR
+      } 
+      // For image files
+      else if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = async (e) => {
           try {
-            // Note: In a production environment, you would want to do OCR on the server
-            // For now, we'll just show a message
-            toast.info('Image processing would be handled on the server in production');
-            setReportText('Image uploaded: ' + file.name + '\n\nPlease paste the report text manually for now.');
+            const base64Image = e.target?.result as string;
+            
+            // Process image with Gemini 1.5 Flash
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const prompt = `Analyze this medical image and provide a summary in ${currentLanguage.name}. Focus on any visible medical conditions, abnormalities, or important details.`;
+            
+            const result = await model.generateContent([
+              prompt,
+              {
+                inlineData: {
+                  mimeType: file.type,
+                  data: base64Image.split(',')[1]
+                }
+              }
+            ]);
+            
+            const response = await result.response;
+            const summary = response.text();
+            
+            setReportText(summary);
+            toast.success('Image processed successfully');
           } catch (error) {
             console.error('Error processing image:', error);
-            toast.error('Failed to process image. Please try copying the text manually.');
+            toast.error('Failed to process image');
           }
         };
         reader.readAsDataURL(file);
       }
     } catch (error) {
       console.error('Error processing file:', error);
-      toast.error('Failed to process file. Please try copying the text manually.');
+      toast.error('Failed to process file');
     } finally {
       setIsProcessingFile(false);
     }
+  };
+
+  // Update handleFileUpload to use Gemini
+  const handleFileUpload = async (file: File) => {
+    setUploadedFile(file);
+    await processFileWithGemini(file);
   };
 
   const extractTextFromPDF = async (arrayBuffer: ArrayBuffer): Promise<string> => {
@@ -1246,4 +1328,4 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
   );
 };
 
-export default AiDoctor; 
+export default AiDoctor;
