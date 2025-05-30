@@ -1,8 +1,10 @@
-
 // chathandler.controller.js - Enhanced version for better video calling
 import { Server } from "socket.io";
 import mongoose from "mongoose";
 import { Conversation } from "../models/chat.model.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const onlineUsers = new Map();
 const activeCalls = new Map();
@@ -10,7 +12,10 @@ const activeCalls = new Map();
 export function setupSocketIO(server) {
   const io = new Server(server, {
     cors: {
-      origin: ["http://localhost:8080", "https://video-spark-link.vercel.app"],
+      origin: [
+        "http://localhost:8080",
+        process.env.CLIEND_URL || "https://mvp-mediqly.vercel.app",
+      ],
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -174,7 +179,9 @@ export function setupSocketIO(server) {
 
     socket.on("initiate-call", (data) => {
       const { from, fromType, to, toType } = data;
-      console.log(`Call initiation: ${from} (${fromType}) -> ${to} (${toType})`);
+      console.log(
+        `Call initiation: ${from} (${fromType}) -> ${to} (${toType})`
+      );
 
       if (!from || !to) {
         console.error("Missing from or to in initiate-call");
@@ -199,7 +206,9 @@ export function setupSocketIO(server) {
       activeCalls.set(from, { partnerId: to, socketId: socket.id });
       activeCalls.set(to, { partnerId: from, socketId: target.socketId });
 
-      console.log(`Sending incoming call to ${to} at socket ${target.socketId}`);
+      console.log(
+        `Sending incoming call to ${to} at socket ${target.socketId}`
+      );
 
       // Send incoming call notification immediately
       io.to(target.socketId).emit("incoming-call", {

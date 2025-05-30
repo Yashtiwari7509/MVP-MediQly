@@ -16,7 +16,10 @@ connectToDb().catch(console.error);
 // Configure CORS with more options
 app.use(
   cors({
-    origin: ["http://localhost:8080", "https://video-spark-link.vercel.app"],
+    origin: [
+      "http://localhost:8080",
+      process.env.CLIEND_URL || "https://mvp-mediqly.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
