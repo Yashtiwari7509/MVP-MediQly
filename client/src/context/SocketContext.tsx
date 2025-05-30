@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/auth/AuthProvider";
 
@@ -16,6 +22,7 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const socketRef = useRef<Socket | null>(null);
+  const [isReady, setIsReady] = useState(false);
   const { currentUser, currentDoctor, userType } = useAuth();
 
   const currentId = userType === "user" ? currentUser?._id : currentDoctor?._id;
@@ -23,26 +30,32 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!currentId) return;
 
-    // Connect to socket server
-    socketRef.current = io(API_BASE_URL, {
+    const socket = io(API_BASE_URL, {
       query: {
         userId: currentId,
         userType,
       },
     });
 
-    // Send user connect event
-    socketRef.current.emit("user-connect", {
+    socket.emit("user-connect", {
       userId: currentId,
       userType,
     });
 
+    socketRef.current = socket;
+    setIsReady(true);
+
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
+      socket.disconnect();
+      socketRef.current = null;
+      setIsReady(false);
     };
   }, [currentId, userType]);
+
+  // Don't render children until socket is ready
+  // if (!isReady) {
+  //   return null; // or loading spinner
+  // }
 
   return (
     <SocketContext.Provider value={{ socket: socketRef.current }}>

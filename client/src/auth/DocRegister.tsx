@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { HeartPulse, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,11 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import { toast } from "sonner";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Logo from "@/components/Logo";
 import { useDocRegister } from "@/hooks/auth";
 
 const formSchema = z.object({
@@ -54,14 +53,12 @@ const formSchema = z.object({
     "General Practitioner",
     "Other",
   ]),
-  experience: z
-    .preprocess((val) => Number(val), z.number().min(0, "Experience must be a positive number")),
+  experience: z.coerce.number().min(0, "Experience must be a positive number"),
   qualifications: z.array(
     z.string().min(2, "Qualification must be at least 2 characters long")
   ),
 });
-const Register = () => {
-  const { toast } = useToast();
+const DocRegister = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [qualifications, setQualifications] = useState([""]);
@@ -86,7 +83,7 @@ const Register = () => {
       lastName: "",
       phoneNumber: "",
       specialization: undefined,
-      experience: undefined,
+      experience: 0,
       qualifications: [""],
     },
   });
@@ -96,30 +93,25 @@ const Register = () => {
     setQualifications([...qualifications, ""]);
   };
 
-  const removeQualification = (index) => {
+  const removeQualification = (index: any) => {
     const newQualifications = qualifications.filter((_, i) => i !== index);
     setQualifications(newQualifications);
   };
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     docRegister.mutate(values as any, {
       onSuccess: () => {
-        toast({
-          title: "Success",
-          description:
-            "Doctor account created successfully. Redirecting to login...",
-        });
+        toast.success(
+          "Doctor account created successfully. Redirecting to login..."
+        );
         navigate("/");
       },
       onError: (error) => {
         console.log(error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description:
-            (error as any).response?.data[0]?.message ||
+        toast.error(
+          (error as any).response?.data[0]?.message ||
             (error as any).response?.data?.message ||
-            "Registration failed",
-        });
+            "Registration failed"
+        );
       },
     });
   };
@@ -128,10 +120,7 @@ const Register = () => {
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="auth-Image relative hidden h-full flex-col bg-cover bg-center bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0" />
-        <div className="relative z-20 flex items-center gap-2 text-lg font-bold">
-          <HeartPulse className="h-6 w-6" />
-          MediQly
-        </div>
+        <Logo />
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
@@ -195,7 +184,11 @@ const Register = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" {...field} />
+                        <Input
+                          type="email"
+                          {...field}
+                          autoComplete="current-email"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -213,6 +206,7 @@ const Register = () => {
                           <Input
                             type={showPassword ? "text" : "password"}
                             {...field}
+                            autoComplete="current-password"
                           />
                         </FormControl>
                         <button
@@ -305,7 +299,11 @@ const Register = () => {
                         render={({ field }) => (
                           <FormItem className="flex-1">
                             <FormControl>
-                              <Input {...field} placeholder="e.g., MBBS, MD" />
+                              <Input
+                                {...field}
+                                type="text"
+                                placeholder="e.g., MBBS, MD"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -340,26 +338,7 @@ const Register = () => {
               >
                 {docRegister.isPending ? (
                   <div className="flex items-center gap-2">
-                    <svg
-                      className="animate-spin h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
+                    <Loader2 className="animate-spin" />
                     Creating account...
                   </div>
                 ) : (
@@ -384,4 +363,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default DocRegister;

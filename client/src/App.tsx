@@ -28,7 +28,9 @@ import ConsultationBooking from "./pages/ConsBooking";
 import Consultation from "./pages/Consultation";
 import Emergency from "./pages/Emergency";
 import CalorieCalculator from "./pages/CalorieCalculator";
-import AuthSocketProvider from "./context/AuthSocketProvider";
+import { SocketProvider } from "./context/SocketContext";
+import PrivateRoute from "./Protect/ProtectedRoute";
+import { AuthProvider } from "./auth/AuthProvider";
 
 const queryClient = new QueryClient();
 const App = () => (
@@ -42,149 +44,154 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <AuthSocketProvider>
-                    <Index />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/doc-register" element={<DocRegister />} />
-              <Route
-                path="/profile"
-                element={
-                  <AuthSocketProvider>
-                    <Profile />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/health-tracker"
-                element={
-                  <AuthSocketProvider>
-                    <HealthTracker />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/preventive-health"
-                element={
-                  <AuthSocketProvider>
-                    <PreventiveHealth />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/insurance"
-                element={
-                  <AuthSocketProvider>
-                    <Insurance />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/symptoms"
-                element={
-                  <AuthSocketProvider>
-                    <Symptoms />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/consultation"
-                element={
-                  <AuthSocketProvider>
-                    <Consultation />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/consultation/:doctorId"
-                element={
-                  <AuthSocketProvider>
-                    <ConsultationBooking />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/medicine"
-                element={
-                  <AuthSocketProvider>
-                    <Medicine />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/calorie-calculator"
-                element={
-                  <AuthSocketProvider>
-                    <CalorieCalculator />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/chat"
-                element={
-                  <AuthSocketProvider>
-                    <ChatCall />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/ai-doctor"
-                element={
-                  <AuthSocketProvider>
-                    <AiDoctor />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/feed"
-                element={
-                  <AuthSocketProvider>
-                    <HealthFeedPage />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/report"
-                element={
-                  <AuthSocketProvider>
-                    <MainLayout>
-                      <RepostsPage />
-                    </MainLayout>
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/diet"
-                element={
-                  <AuthSocketProvider>
-                    <Diet />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="/emergency"
-                element={
-                  <AuthSocketProvider>
-                    <Emergency />
-                  </AuthSocketProvider>
-                }
-              />
-              <Route
-                path="*"
-                element={
-                  <AuthSocketProvider>
-                    <NotFound />
-                  </AuthSocketProvider>
-                }
-              />
-            </Routes>
+            <AuthProvider>
+              <SocketProvider>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/user-register" element={<Register />} />
+                  <Route path="/doc-register" element={<DocRegister />} />
+
+                  <Route
+                    path="/"
+                    element={
+                      <PrivateRoute>
+                        <Index />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <PrivateRoute>
+                        <Profile />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/health-tracker"
+                    element={
+                      <PrivateRoute>
+                        <HealthTracker />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/preventive-health"
+                    element={
+                      <PrivateRoute>
+                        <PreventiveHealth />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/insurance"
+                    element={
+                      <PrivateRoute>
+                        <Insurance />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/symptoms"
+                    element={
+                      <PrivateRoute>
+                        <Symptoms />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/consultation"
+                    element={
+                      <PrivateRoute>
+                        <Consultation />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/consultation/:doctorId"
+                    element={
+                      <PrivateRoute>
+                        <ConsultationBooking />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/medicine"
+                    element={
+                      <PrivateRoute>
+                        <Medicine />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/calorie-calculator"
+                    element={
+                      <PrivateRoute>
+                        <CalorieCalculator />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/chat"
+                    element={
+                      <PrivateRoute>
+                        <ChatCall />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/ai-doctor"
+                    element={
+                      <PrivateRoute>
+                        <AiDoctor />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/feed"
+                    element={
+                      <PrivateRoute>
+                        <HealthFeedPage />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/report"
+                    element={
+                      <PrivateRoute>
+                        <MainLayout>
+                          <RepostsPage />
+                        </MainLayout>
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/diet"
+                    element={
+                      <PrivateRoute>
+                        <Diet />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/emergency"
+                    element={
+                      <PrivateRoute>
+                        <Emergency />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="*"
+                    element={
+                      <PrivateRoute>
+                        <NotFound />
+                      </PrivateRoute>
+                    }
+                  />
+                </Routes>
+              </SocketProvider>
+            </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

@@ -10,7 +10,6 @@ import { Phone, Video, Send, UserCheck, User2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/auth/AuthProvider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import io from "socket.io-client";
 import api from "@/utils/api";
 import { doctorProfileProps, UserProps } from "@/lib/user.type";
 import { useVideoCall } from "@/hooks/useVideoCall";
@@ -78,7 +77,6 @@ const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
-  // const socketRef = useRef<any>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
   const { socket } = useSocket();
 
@@ -116,21 +114,150 @@ const Chat = () => {
     if (!currentId) return;
 
     socket.emit("get-conversations", { userId: currentId });
-    socket.on("user-conversations", (data) => {
-      setConversations(data.conversations);
-    });
   };
 
-  // Fetch conversations on component mount
+  // Setup socket event listeners
   useEffect(() => {
-    if (socket) {
-      fetchConversations();
-    }
-  }, [socket]);
+    if (!socket || !currentId) return;
+
+    console.log(socket, "setting up socket listeners");
+
+    // Listen for conversations
+    const handleUserConversations = (data) => {
+      setConversations(data.conversations);
+    };
+
+    // Listen for chat history
+    const handleChatHistory = (data) => {
+      if (
+        currentConversation &&
+        data.conversationId === currentConversation._id
+      ) {
+        setMessages(data.messages);
+      }
+    };
+
+    // Listen for new messages in real-time
+    const handleNewMessage = (message) => {
+      console.log("Received new message:", message);
+
+      // Check if this message belongs to the current conversation
+      if (
+        currentConversation &&
+        ((message.sender.id === currentId &&
+          message.receiver.id === selectedRecipient?._id) ||
+          (message.sender.id === selectedRecipient?._id &&
+            message.receiver.id === currentId))
+      ) {
+        setMessages((prevMessages) => {
+          // Check if message already exists to prevent duplicates
+          const messageExists = prevMessages.some(
+            (msg) => msg._id === message._id
+          );
+          if (messageExists) {
+            return prevMessages;
+          }
+          return [...prevMessages, message];
+        });
+
+        // Mark message as read if it's not from current user
+        if (message.sender.id !== currentId && currentConversation) {
+          socket.emit("mark-messages-read", {
+            conversationId: currentConversation._id,
+            userId: currentId,
+          });
+        }
+      }
+
+      // Update conversations list to reflect new message
+      setConversations((prevConversations) => {
+        return prevConversations.map((conv) => {
+          // Find the conversation that should be updated
+          const isRelevantConversation = conv.participants.some(
+            (p) => p.id === message.sender.id || p.id === message.receiver.id
+          );
+
+          if (isRelevantConversation) {
+            return {
+              ...conv,
+              lastMessage: {
+                text: message.text,
+                sender: message.sender.id,
+                timestamp: message.createdAt,
+              },
+            };
+          }
+          return conv;
+        });
+      });
+    };
+
+    // Listen for message sent confirmation
+    const handleMessageSent = (data) => {
+      console.log("Message sent confirmation:", data);
+
+      if (data.success && selectedRecipient) {
+        // Add the sent message to the messages array immediately
+        const sentMessage = {
+          _id: data.message._id || Date.now().toString(), // Fallback ID
+          text: data.message.text,
+          sender: {
+            id: currentId,
+            type: userType,
+          },
+          receiver: {
+            id: selectedRecipient._id,
+            type: userType === "user" ? "doctor" : "user",
+          },
+          read: false,
+          createdAt: data.message.createdAt || new Date().toISOString(),
+        };
+
+        setMessages((prevMessages) => {
+          // Check if message already exists to prevent duplicates
+          const messageExists = prevMessages.some(
+            (msg) =>
+              msg._id === sentMessage._id ||
+              (msg.text === sentMessage.text &&
+                msg.sender.id === sentMessage.sender.id &&
+                Math.abs(
+                  new Date(msg.createdAt).getTime() -
+                    new Date(sentMessage.createdAt).getTime()
+                ) < 1000)
+          );
+
+          if (messageExists) {
+            return prevMessages;
+          }
+          return [...prevMessages, sentMessage];
+        });
+
+        // Refresh conversations to update last message
+        fetchConversations();
+      }
+    };
+
+    // Add event listeners
+    socket.on("user-conversations", handleUserConversations);
+    socket.on("chat-history", handleChatHistory);
+    socket.on("new-message", handleNewMessage);
+    socket.on("message-sent", handleMessageSent);
+
+    // Fetch conversations on component mount
+    fetchConversations();
+
+    // Cleanup function
+    return () => {
+      socket.off("user-conversations", handleUserConversations);
+      socket.off("chat-history", handleChatHistory);
+      socket.off("new-message", handleNewMessage);
+      socket.off("message-sent", handleMessageSent);
+    };
+  }, [socket, currentId, currentConversation, selectedRecipient, userType]);
 
   // Fetch chat history when a recipient is selected
   useEffect(() => {
-    if (!selectedRecipient || !currentId) return;
+    if (!selectedRecipient || !currentId || !socket) return;
 
     // Find existing conversation or create new one
     const recipientId = selectedRecipient._id;
@@ -146,22 +273,16 @@ const Chat = () => {
         conversationId: existingConversation._id,
       });
 
-      socket.on("chat-history", (data) => {
-        if (data.conversationId === existingConversation._id) {
-          setMessages(data.messages);
-
-          // Mark messages as read
-          socket.emit("mark-messages-read", {
-            conversationId: existingConversation._id,
-            userId: currentId,
-          });
-        }
+      // Mark messages as read
+      socket.emit("mark-messages-read", {
+        conversationId: existingConversation._id,
+        userId: currentId,
       });
     } else {
       setCurrentConversation(null);
       setMessages([]);
     }
-  }, [selectedRecipient, currentId, conversations]);
+  }, [selectedRecipient, currentId, conversations, socket]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -170,7 +291,8 @@ const Chat = () => {
 
   // Send message handler
   const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedRecipient || !currentId) return;
+    if (!newMessage.trim() || !selectedRecipient || !currentId || !socket)
+      return;
 
     const recipientId = selectedRecipient._id;
     const recipientType = userType === "user" ? "doctor" : "user";
@@ -179,15 +301,17 @@ const Chat = () => {
     const messageData = {
       senderId: currentId,
       receiverId: recipientId,
-      text: newMessage,
+      text: newMessage.trim(),
       senderType: userType,
       receiverType: recipientType,
     };
 
+    console.log("Sending message:", messageData);
+
     // Send message via socket
     socket.emit("send-message", messageData);
 
-    // Clear input
+    // Clear input immediately
     setNewMessage("");
   };
 
@@ -202,6 +326,7 @@ const Chat = () => {
       });
       return;
     }
+    console.log(socket, socket.connected, "hello how are");
 
     if (!socket || !socket.connected) {
       console.error("Socket not connected");
@@ -233,9 +358,9 @@ const Chat = () => {
         variant: "destructive",
       });
     }
-  }, [selectedRecipient, currentId, userType, initiateCall, toast]);
+  }, [selectedRecipient, currentId, userType, initiateCall, toast, socket]);
 
-  // 4. Enhanced error handling for audio calls
+  // Enhanced error handling for audio calls
   const startAudioCall = useCallback(async () => {
     if (!selectedRecipient || !currentId) {
       console.error("Cannot start call: missing recipient or current user ID");
@@ -277,14 +402,14 @@ const Chat = () => {
         variant: "destructive",
       });
     }
-  }, [selectedRecipient, currentId, userType, initiateCall, toast]);
+  }, [selectedRecipient, currentId, userType, initiateCall, toast, socket]);
 
   // Helper function to get recipient name
   const getRecipientName = (recipient: User | Doctor) => {
     return `${recipient.firstName} ${recipient.lastName}`;
   };
 
-  // 2. Fix the video call initialization condition
+  // Fix the video call initialization condition
   const isVideoCallOpen = useMemo(() => {
     return (
       callState.isInCall || callState.isInitiating || callState.isReceiving
@@ -366,11 +491,6 @@ const Chat = () => {
                                 "No messages yet"}
                             </p>
                           </div>
-                          {/* {otherParticipant?.unreadCount > 0 && (
-                            <Badge variant="destructive">
-                              {otherParticipant.unreadCount}
-                            </Badge>
-                          )} */}
                         </div>
                       );
                     })}

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,10 +13,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, HeartPulse, User, Stethoscope } from "lucide-react";
-import "../index.css";
-import { useLogin } from "../hooks/auth"; // Import useLogin hook
+import { toast } from "sonner";
+import { Eye, EyeOff, User, Stethoscope } from "lucide-react";
+import "@/index.css";
+import Logo from "@/components/Logo";
+import { useLogin } from "@/hooks/auth";
 
 const formSchema = z.object({
   email: z.string().email("Must be a valid email"),
@@ -24,7 +25,6 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState<"user" | "doctor">("user"); // New: Toggle between User & Doctor
@@ -45,37 +45,26 @@ const Login = () => {
       { credentials: values, loginType },
       {
         onSuccess: () => {
-          toast({
-            title: "Success",
-            description: `${
-              loginType === "user" ? "User" : "Doctor"
-            } logged in successfully. Redirecting... to home Page`,
-          });
+          toast.success("Logged-In! successfully. Redirecting to login...");
           navigate("/");
         },
         onError: (error) => {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description:
-              (error as any)?.response?.data.message || "Login failed",
-          });
+          console.log(error);
+
+          toast.error((error as any).response.data.message);
         },
       }
     );
   };
 
   return (
-    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div className="container  relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       {/* Left Side with Background */}
       <div
         style={{ backgroundImage: `url("../../aiH.jpg")` }}
         className="relative hidden h-full bg-cover bg-center flex-col bg-muted p-10 text-white dark:border-r lg:flex"
       >
-        <div className="relative z-20 flex items-center gap-2 text-lg font-bold primary-grad">
-          <HeartPulse className="h-6 w-6" />
-          MediQly
-        </div>
+        <Logo />
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
@@ -132,6 +121,7 @@ const Login = () => {
                       <Input
                         type="email"
                         placeholder="name@example.com"
+                        autoComplete="current-email"
                         {...field}
                       />
                     </FormControl>
@@ -189,7 +179,7 @@ const Login = () => {
           <div className="text-center text-sm text-muted-foreground">
             Don't have an account?
             <Link
-              to={loginType === "user" ? "/register" : "/doc-register"}
+              to={loginType === "user" ? "/user-register" : "/doc-register"}
               className="underline underline-offset-4 hover:text-primary"
             >
               Sign up as a {loginType}

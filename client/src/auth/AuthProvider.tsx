@@ -1,89 +1,96 @@
+// src/provider/AuthProvider.tsx
 import { createContext, useContext, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useLocation } from "react-router-dom"; // 🔹 Added `useLocation`
 import api from "@/utils/api";
+import { doctorProfileProps, UserProps } from "@/lib/user.type";
 import { getToken, getUserType } from "@/hooks/auth";
-import { profileProps, doctorProfileProps } from "@/lib/user.type";
-import { LoaderIcon } from "lucide-react";
-import "@/App.css";
 
 interface AuthContextType {
-  currentUser: profileProps | null;
+  currentUser: UserProps | null;
   currentDoctor: doctorProfileProps | null;
   userType: "user" | "doctor" | null;
   isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({ children }) => {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const location = useLocation(); // 🔹 Get current route
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const token = getToken();
   const userType = getUserType();
+  const queryClient = useQueryClient();
 
-  // 🔹 Fetch User Profile (For Users)
   const { data: currentUser, isLoading: isUserLoading } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       if (!token || userType !== "user") return null;
-      const { data } = await api.get("/users/profile");
-      return data;
+      try {
+        const { data } = await api.get("/users/profile");
+        console.log(data, "users");
+
+        return data;
+      } catch (error) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userType");
+        return null;
+      }
     },
     enabled: !!token && userType === "user",
     staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
 
-  // 🔹 Fetch Doctor Profile (For Doctors)
   const { data: currentDoctor, isLoading: isDoctorLoading } = useQuery({
     queryKey: ["currentDoctor"],
     queryFn: async () => {
       if (!token || userType !== "doctor") return null;
-      const { data } = await api.get("/doctors/profile");
-      navigate("/");
-      return data;
+      try {
+        const { data } = await api.get("/doctors/profile");
+        console.log(data, "doctors");
+
+        return data;
+      } catch (error) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userType");
+        return null;
+      }
     },
     enabled: !!token && userType === "doctor",
     staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
-  console.log(currentUser, currentDoctor, "data calling");
 
-  // 🔹 Compute Authentication State
-  const isLoading = isUserLoading || isDoctorLoading;
-  const isAuthenticated = useMemo(
-    () => !!(currentUser || currentDoctor),
-    [currentUser, currentDoctor]
-  );
+  // Determine authentication and loading state
+  const isAuthenticated = !!(currentUser || currentDoctor);
 
-  // 🔹 Redirect Only on **Protected Routes**
+  const isLoading = !!token && (isUserLoading || isDoctorLoading);
+
+  // Re-fetch if token exists but no data (e.g. on refresh)
   useEffect(() => {
-    console.log("render auth provider");
+    console.log("coponent mounted");
 
-    if (!isLoading && !isAuthenticated) {
-      // navigate("/login");
+    if (token && !isAuthenticated && !isLoading) {
+      queryClient.invalidateQueries({
+        queryKey: userType === "doctor" ? ["currentDoctor"] : ["currentUser"],
+      });
     }
-  }, [isLoading, isAuthenticated, navigate]);
-
-  // 🔹 Show Loading While Fetching Data
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex justify-center items-center w-screen h-[100vh]">
-  //       <span className="loader"></span>
-  //     </div>
-  //   );
-  // }
+  }, [token, userType, isAuthenticated, isLoading, queryClient]);
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, currentDoctor, userType, isLoading }}
+      value={{
+        currentUser,
+        currentDoctor,
+        userType,
+        isLoading,
+        isAuthenticated,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook to access auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

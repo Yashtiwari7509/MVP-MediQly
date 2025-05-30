@@ -24,10 +24,7 @@ export const getToken = () => {
 
 // Register User & Store Token
 const registerUser = async (userData: any) => {
-  const { data } = await axios.post(
-    BASE_URL + "/users/register",
-    userData
-  );
+  const { data } = await axios.post(BASE_URL + "/users/register", userData);
   setAuthData(data.token, "user");
   return data;
 };
@@ -49,7 +46,7 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    { user: any }, // Adjust the type as needed
+    { user?: any; doctor?: any }, // ✅ Support both
     Error,
     {
       credentials: { email: string; password: string };
@@ -58,11 +55,16 @@ export const useLogin = () => {
   >({
     mutationFn: ({ credentials, loginType }) =>
       login({ credentials, loginType }),
-    onSuccess: (data) => {
-      queryClient.setQueryData(["currentUser"], data.user);
+    onSuccess: (data, variables) => {
+      if (variables.loginType === "doctor") {
+        queryClient.setQueryData(["currentDoctor"], data.doctor);
+      } else {
+        queryClient.setQueryData(["currentUser"], data.user);
+      }
     },
   });
 };
+
 
 // useRegister (Remains the Same)
 export const useRegister = () => {
