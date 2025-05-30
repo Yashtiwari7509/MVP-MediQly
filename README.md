@@ -1,5 +1,26 @@
 # 🌐 MediQly — Revolutionizing Healthcare Through IoT and AI
 
+
+> 🚨🚨 **IMPORTANT ALERT FOR HACKATHON REVIEWERS** 🚨🚨  
+> 
+> 🧪 **GUEST MODE ENABLED FOR DEMO PURPOSES**  
+> 
+> For convenience during this hackathon:
+> 
+> ✅ A **Guest Account** is available to **quickly explore** the platform.  
+> ❌ **No full account registration** is required for initial access.  
+> 
+> ⚠️ However, please note:
+> 
+> - 🧑‍💻 **Authentication is active behind the scenes**.
+> - 🔁 If you **log out** of the guest session, the system will **redirect you to the Sign In / Sign Up page**.
+> - 🔐 This ensures we **maintain full auth compliance and security**.
+> 
+> 👉 **Please use the guest session only for demo and feature exploration.**
+> 
+> 🎯 This setup allows smooth evaluation while preserving real-world user flow integrity.
+
+
 ---
 
 ## 🚨 Why This Project Is Necessary
