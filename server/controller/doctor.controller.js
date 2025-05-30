@@ -50,59 +50,44 @@ export async function signInDoctor(req, res) {
   try {
     // Validate request input
     const errors = validationResult(req);
+    console.log(errors);
+
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { email, password } = req.body;
+    console.log(email, password);
 
     // Check if doctor exists
-    const doctor = await doctorModel.findOne({ email }).select("+password");
+    const doctor = await doctorModel.findOne({ email });
+    console.log(doctor);
 
     if (!doctor) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Validate password
-    try {
-      const isPasswordValid = await doctor.comparePassword(password);
-      
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
+    // Compare passwords
+    const isPasswordValid = await doctor.comparePassword(password);
+    console.log(isPasswordValid);
 
-      // Generate authentication token
-      const token = doctor.generateAuthToken();
-
-      // Remove password from response
-      const doctorResponse = doctor.toObject();
-      delete doctorResponse.password;
-
-      // Update online status without validation
-      await doctorModel.findByIdAndUpdate(
-        doctor._id,
-        {
-          $set: {
-            isOnline: true,
-            lastActive: new Date()
-          }
-        },
-        { 
-          new: true,
-          validateBeforeSave: false
-        }
-      );
-
-      // Respond with doctor data & token
-      return res.status(200).json({
-        message: "Login successful",
-        token,
-        doctor: doctorResponse,
-      });
-    } catch (passwordError) {
-      console.error("Password comparison error:", passwordError);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
+
+    // Generate authentication token
+    const token = doctor.generateAuthToken();
+
+    // Remove password from response
+    const doctorResponse = doctor.toObject();
+    delete doctorResponse.password;
+
+    // Respond with doctor data & token
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      doctor: doctorResponse,
+    });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ message: "Internal Server Error" });

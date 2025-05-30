@@ -2,8 +2,10 @@ import api from "@/utils/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
-console.log(BASE_URL);
+const BASE_PRL = import.meta.env.VITE_BASE_URL;
+const BASE_LRL = import.meta.env.VITE_BASE_LRL;
+
+const BASE_URL = BASE_LRL || BASE_PRL;
 
 const setAuthData = (token: string, userType: "user" | "doctor") => {
   localStorage.setItem("token", token);
@@ -11,7 +13,7 @@ const setAuthData = (token: string, userType: "user" | "doctor") => {
 };
 
 // Function to get user type
-export const getUserType = () => {
+export const getUserType = (): "user" | "doctor" | null => {
   return localStorage.getItem("userType") as "user" | "doctor" | null;
 };
 
@@ -23,7 +25,7 @@ export const getToken = () => {
 // Register User & Store Token
 const registerUser = async (userData: any) => {
   const { data } = await axios.post(
-    `${BASE_URL}/api/users/register`,
+    BASE_URL + "/users/register",
     userData
   );
   setAuthData(data.token, "user");
@@ -34,18 +36,12 @@ const registerUser = async (userData: any) => {
 const login = async ({ credentials, loginType }) => {
   const endpoint =
     loginType === "doctor"
-      ? `${BASE_URL}/api/doctors/login`
-      : `${BASE_URL}/api/users/login`;
+      ? BASE_URL + "/doctors/login"
+      : BASE_URL + "/users/login";
 
   const { data } = await axios.post(endpoint, credentials);
   setAuthData(data.token, loginType);
-  
-  // Return data in a consistent format
-  return {
-    token: data.token,
-    user: loginType === "user" ? data.user : null,
-    doctor: loginType === "doctor" ? data.doctor : null
-  };
+  return data;
 };
 
 // 🔹 Updated useLogin Hook (Accepts loginType)
@@ -53,7 +49,7 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    { token: string; user?: any; doctor?: any },
+    { user: any }, // Adjust the type as needed
     Error,
     {
       credentials: { email: string; password: string };
@@ -62,24 +58,8 @@ export const useLogin = () => {
   >({
     mutationFn: ({ credentials, loginType }) =>
       login({ credentials, loginType }),
-    onSuccess: (data, variables) => {
-      // Clear both user and doctor data first
-      queryClient.setQueryData(["currentUser"], null);
-      queryClient.setQueryData(["currentDoctor"], null);
-      
-      // Then set the appropriate data
-      if (variables.loginType === "doctor") {
-        queryClient.setQueryData(["currentDoctor"], data.doctor);
-      } else {
-        queryClient.setQueryData(["currentUser"], data.user);
-      }
-      
-      // Force a refetch of the profile
-      if (variables.loginType === "doctor") {
-        queryClient.invalidateQueries({ queryKey: ["currentDoctor"] });
-      } else {
-        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      }
+    onSuccess: (data) => {
+      queryClient.setQueryData(["currentUser"], data.user);
     },
   });
 };
@@ -119,7 +99,7 @@ const registerDoctor = async (userData) => {
   };
   console.log(formattedData, "ahhah");
   const { data } = await axios.post(
-    `${BASE_URL}/api/doctors/register`,
+    BASE_URL + "/doctors/register",
     formattedData
   );
   setAuthData(data.token, "doctor");

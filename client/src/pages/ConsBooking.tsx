@@ -77,7 +77,9 @@ const ConsultationBooking = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [doctor, setDoctor] = useState(dummyDoctors.find(d => d._id === doctorId));
+  const [doctor, setDoctor] = useState(
+    dummyDoctors.find((d) => d._id === doctorId)
+  );
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -122,8 +124,13 @@ const ConsultationBooking = () => {
     };
 
     // For now, we'll store it in localStorage
-    const existingBookings = JSON.parse(localStorage.getItem("myBookings") || "[]");
-    localStorage.setItem("myBookings", JSON.stringify([...existingBookings, booking]));
+    const existingBookings = JSON.parse(
+      localStorage.getItem("myBookings") || "[]"
+    );
+    localStorage.setItem(
+      "myBookings",
+      JSON.stringify([...existingBookings, booking])
+    );
 
     toast({
       title: "Success",
@@ -161,8 +168,12 @@ const ConsultationBooking = () => {
                       Dr. {doctor.firstName} {doctor.lastName}
                     </h2>
                     <p className="text-gray-600">{doctor.specialization}</p>
-                    <p className="text-gray-600">{doctor.experience} years experience</p>
-                    <p className="text-gray-600">Consultation Fee: ₹{doctor.consultationFees}</p>
+                    <p className="text-gray-600">
+                      {doctor.experience} years experience
+                    </p>
+                    <p className="text-gray-600">
+                      Consultation Fee: ₹{doctor.consultationFees}
+                    </p>
                   </div>
                   <Button
                     variant="outline"
@@ -193,13 +204,17 @@ const ConsultationBooking = () => {
                 {availableDates.map((date) => (
                   <Button
                     key={date.formatted}
-                    variant={selectedDate === date.formatted ? "default" : "outline"}
+                    variant={
+                      selectedDate === date.formatted ? "default" : "outline"
+                    }
                     className="w-full justify-start"
                     onClick={() => handleDateSelect(date.formatted)}
                   >
                     <div className="flex flex-col items-start">
                       <span className="font-medium">{date.formatted}</span>
-                      <span className="text-sm text-gray-500">{date.dayName}</span>
+                      <span className="text-sm text-gray-500">
+                        {date.dayName}
+                      </span>
                     </div>
                   </Button>
                 ))}
@@ -217,7 +232,9 @@ const ConsultationBooking = () => {
                   {timeSlots.map((slot) => (
                     <Button
                       key={slot.time}
-                      variant={selectedTime === slot.time ? "default" : "outline"}
+                      variant={
+                        selectedTime === slot.time ? "default" : "outline"
+                      }
                       className="w-full"
                       disabled={!slot.isAvailable}
                       onClick={() => handleTimeSelect(slot.time)}
@@ -248,7 +265,8 @@ const ConsultationBooking = () => {
               <DialogHeader>
                 <DialogTitle>Choose Consultation Type</DialogTitle>
                 <DialogDescription>
-                  How would you like to proceed with Dr. {doctor.firstName} {doctor.lastName}?
+                  How would you like to proceed with Dr. {doctor.firstName}{" "}
+                  {doctor.lastName}?
                 </DialogDescription>
               </DialogHeader>
               <div className="grid grid-cols-2 gap-4 py-4">
@@ -278,7 +296,10 @@ const ConsultationBooking = () => {
                 </Button>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowConfirmDialog(false)}
+                >
                   Cancel
                 </Button>
               </DialogFooter>
@@ -290,4 +311,4 @@ const ConsultationBooking = () => {
   );
 };
 
-export default ConsultationBooking; 
+export default ConsultationBooking;

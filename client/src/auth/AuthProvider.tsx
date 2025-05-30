@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); // 🔹 Get current route
   const token = getToken();
   const userType = getUserType();
 
@@ -28,19 +28,11 @@ export const AuthProvider = ({ children }) => {
     queryKey: ["currentUser"],
     queryFn: async () => {
       if (!token || userType !== "user") return null;
-      try {
-        const { data } = await api.get("/users/profile");
-        return data;
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("userType");
-        return null;
-      }
+      const { data } = await api.get("/users/profile");
+      return data;
     },
     enabled: !!token && userType === "user",
     staleTime: 5 * 60 * 1000,
-    retry: 1,
   });
 
   // 🔹 Fetch Doctor Profile (For Doctors)
@@ -48,65 +40,39 @@ export const AuthProvider = ({ children }) => {
     queryKey: ["currentDoctor"],
     queryFn: async () => {
       if (!token || userType !== "doctor") return null;
-      try {
-        const { data } = await api.get("/doctors/profile");
-        return data;
-      } catch (error) {
-        console.error("Error fetching doctor profile:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("userType");
-        return null;
-      }
+      const { data } = await api.get("/doctors/profile");
+      navigate("/");
+      return data;
     },
     enabled: !!token && userType === "doctor",
     staleTime: 5 * 60 * 1000,
-    retry: 1,
   });
+  console.log(currentUser, currentDoctor, "data calling");
 
   // 🔹 Compute Authentication State
-  const isLoading = (!!token && (isUserLoading || isDoctorLoading));
+  const isLoading = isUserLoading || isDoctorLoading;
   const isAuthenticated = useMemo(
     () => !!(currentUser || currentDoctor),
     [currentUser, currentDoctor]
   );
 
-  // 🔹 Handle Authentication and Redirection
+  // 🔹 Redirect Only on **Protected Routes**
   useEffect(() => {
-    console.log("Auth state:", {
-      isLoading,
-      isAuthenticated,
-      token,
-      userType,
-      currentUser,
-      currentDoctor,
-    });
+    console.log("render auth provider");
 
-    if (!isLoading) {
-      const isPublicRoute = ["/login", "/register", "/doc-register"].includes(
-        location.pathname
-      );
-
-      if (!token && !isPublicRoute) {
-        navigate("/login");
-      } else if (token && !isAuthenticated && !isLoading) {
-        // If we have a token but no user data, try to fetch it again
-        if (userType === "doctor") {
-          queryClient.invalidateQueries({ queryKey: ["currentDoctor"] });
-        } else {
-          queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-        }
-      }
+    if (!isLoading && !isAuthenticated) {
+      // navigate("/login");
     }
-  }, [isLoading, isAuthenticated, navigate, token, location.pathname, userType, queryClient]);
+  }, [isLoading, isAuthenticated, navigate]);
 
-  // 🔹 Show Loading While Fetching Initial Data
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center w-screen h-[100vh]">
-        <span className="loader"></span>
-      </div>
-    );
-  }
+  // 🔹 Show Loading While Fetching Data
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex justify-center items-center w-screen h-[100vh]">
+  //       <span className="loader"></span>
+  //     </div>
+  //   );
+  // }
 
   return (
     <AuthContext.Provider

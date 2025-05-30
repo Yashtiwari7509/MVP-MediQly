@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/auth/AuthProvider";
 
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
+
 interface SocketContextType {
   socket: Socket | null;
 }
@@ -22,7 +24,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     if (!currentId) return;
 
     // Connect to socket server
-    socketRef.current = io("http://localhost:8000", {
+    socketRef.current = io(API_BASE_URL, {
       query: {
         userId: currentId,
         userType,

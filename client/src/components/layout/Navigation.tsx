@@ -1,5 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, Calendar, Activity, Menu } from "lucide-react";
+import {
+  Home,
+  User,
+  Calendar,
+  Activity,
+  Menu,
+  Bot,
+  Stethoscope,
+  MessageCircle,
+  Watch,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -7,9 +17,13 @@ import { useEffect } from "react";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
-  { icon: Calendar, label: "Appointments", path: "/appointments" },
-  { icon: Activity, label: "Health", path: "/health-tracker" },
-  { icon: User, label: "Profile", path: "/profile" },
+  { icon: Watch, label: "Watch", path: "/health-tracker" },
+  {
+    icon: MessageCircle,
+    label: "chat",
+    path: "/chat",
+  },
+  { icon: Bot, label: "AI Doctor", path: "/ai-doctor" },
 ];
 
 export function Navigation() {

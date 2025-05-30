@@ -49,7 +49,7 @@ const Login = () => {
             title: "Success",
             description: `${
               loginType === "user" ? "User" : "Doctor"
-            } logged in successfully. Redirecting...`,
+            } logged in successfully. Redirecting... to home Page`,
           });
           navigate("/");
         },

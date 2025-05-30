@@ -5,7 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, User, Brain, Activity, Sparkles, Upload, FileText, Image as ImageIcon, X, Mic, Volume, Camera, List, Globe2 } from "lucide-react";
+import {
+  Bot,
+  Send,
+  User,
+  Brain,
+  Activity,
+  Sparkles,
+  Upload,
+  FileText,
+  Image as ImageIcon,
+  X,
+  Mic,
+  Volume,
+  Camera,
+  List,
+  Globe2,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
@@ -31,7 +47,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import MainLayout from "@/components/layout/MainLayout";
-import { useSpeechRecognition } from 'react-speech-kit';
+import { useSpeechRecognition } from "react-speech-kit";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface Language {
@@ -42,16 +58,16 @@ interface Language {
 }
 
 const languages: Language[] = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
-  { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦', rtl: true },
-  { code: 'zh', name: '中文', flag: '🇨🇳' },
-  { code: 'ur', name: 'اردو', flag: '🇵🇰', rtl: true },
-  { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-  { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-  { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "hi", name: "हिंदी", flag: "🇮🇳" },
+  { code: "bn", name: "বাংলা", flag: "🇧🇩" },
+  { code: "ar", name: "العربية", flag: "🇸🇦", rtl: true },
+  { code: "zh", name: "中文", flag: "🇨🇳" },
+  { code: "ur", name: "اردو", flag: "🇵🇰", rtl: true },
+  { code: "te", name: "తెలుగు", flag: "🇮🇳" },
+  { code: "ta", name: "தமிழ்", flag: "🇮🇳" },
+  { code: "mr", name: "मराठी", flag: "🇮🇳" },
 ];
 
 const translations = {
@@ -107,30 +123,105 @@ interface CommonSymptom {
 }
 
 const commonSymptoms: CommonSymptom[] = [
-  { id: 'fever', label: '🤒 Fever', icon: '🌡️', description: 'Body feels hot' },
-  { id: 'headache', label: '🤕 Headache', icon: '🤕', description: 'Pain in head' },
-  { id: 'cough', label: '😷 Cough', icon: '🤧', description: 'Continuous coughing' },
-  { id: 'stomach', label: '🤢 Stomach Pain', icon: '😣', description: 'Pain in stomach' },
-  { id: 'tired', label: '😫 Feeling Tired', icon: '😴', description: 'No energy' },
-  { id: 'body-pain', label: '🤒 Body Pain', icon: '🤕', description: 'Pain in body' },
+  { id: "fever", label: "🤒 Fever", icon: "🌡️", description: "Body feels hot" },
+  {
+    id: "headache",
+    label: "🤕 Headache",
+    icon: "🤕",
+    description: "Pain in head",
+  },
+  {
+    id: "cough",
+    label: "😷 Cough",
+    icon: "🤧",
+    description: "Continuous coughing",
+  },
+  {
+    id: "stomach",
+    label: "🤢 Stomach Pain",
+    icon: "😣",
+    description: "Pain in stomach",
+  },
+  {
+    id: "tired",
+    label: "😫 Feeling Tired",
+    icon: "😴",
+    description: "No energy",
+  },
+  {
+    id: "body-pain",
+    label: "🤒 Body Pain",
+    icon: "🤕",
+    description: "Pain in body",
+  },
 ];
 
 const commonSymptomsTranslations = {
   en: [
-    { id: 'fever', label: '🤒 Fever', icon: '🌡️', description: 'Body feels hot' },
-    { id: 'headache', label: '🤕 Headache', icon: '🤕', description: 'Pain in head' },
-    { id: 'cough', label: '😷 Cough', icon: '🤧', description: 'Continuous coughing' },
-    { id: 'stomach', label: '🤢 Stomach Pain', icon: '😣', description: 'Pain in stomach' },
-    { id: 'tired', label: '😫 Feeling Tired', icon: '😴', description: 'No energy' },
-    { id: 'body-pain', label: '🤒 Body Pain', icon: '🤕', description: 'Pain in body' },
+    {
+      id: "fever",
+      label: "🤒 Fever",
+      icon: "🌡️",
+      description: "Body feels hot",
+    },
+    {
+      id: "headache",
+      label: "🤕 Headache",
+      icon: "🤕",
+      description: "Pain in head",
+    },
+    {
+      id: "cough",
+      label: "😷 Cough",
+      icon: "🤧",
+      description: "Continuous coughing",
+    },
+    {
+      id: "stomach",
+      label: "🤢 Stomach Pain",
+      icon: "😣",
+      description: "Pain in stomach",
+    },
+    {
+      id: "tired",
+      label: "😫 Feeling Tired",
+      icon: "😴",
+      description: "No energy",
+    },
+    {
+      id: "body-pain",
+      label: "🤒 Body Pain",
+      icon: "🤕",
+      description: "Pain in body",
+    },
   ],
   hi: [
-    { id: 'fever', label: '🤒 बुखार', icon: '🌡️', description: 'शरीर गरम महसूस होता है' },
-    { id: 'headache', label: '🤕 सिरदर्द', icon: '🤕', description: 'सिर में दर्द' },
-    { id: 'cough', label: '😷 खांसी', icon: '🤧', description: 'लगातार खांसी' },
-    { id: 'stomach', label: '🤢 पेट दर्द', icon: '😣', description: 'पेट में दर्द' },
-    { id: 'tired', label: '😫 थकान', icon: '😴', description: 'ऊर्जा नहीं है' },
-    { id: 'body-pain', label: '🤒 शरीर दर्द', icon: '🤕', description: 'शरीर में दर्द' },
+    {
+      id: "fever",
+      label: "🤒 बुखार",
+      icon: "🌡️",
+      description: "शरीर गरम महसूस होता है",
+    },
+    {
+      id: "headache",
+      label: "🤕 सिरदर्द",
+      icon: "🤕",
+      description: "सिर में दर्द",
+    },
+    { id: "cough", label: "😷 खांसी", icon: "🤧", description: "लगातार खांसी" },
+    {
+      id: "stomach",
+      label: "🤢 पेट दर्द",
+      icon: "😣",
+      description: "पेट में दर्द",
+    },
+    { id: "tired", label: "😫 थकान", icon: "😴", description: "ऊर्जा नहीं है" },
+    {
+      id: "body-pain",
+      label: "🤒 शरीर दर्द",
+      icon: "🤕",
+      description: "शरीर में दर्द",
+    },
   ],
   // Add more languages as needed
 };
@@ -138,7 +229,8 @@ const commonSymptomsTranslations = {
 const uiTranslations = {
   en: {
     welcomeTitle: "AI Health Assistant",
-    welcomeDescription: "I'm your AI Doctor Assistant, equipped with advanced medical knowledge and natural language understanding. How can I help you today?",
+    welcomeDescription:
+      "I'm your AI Doctor Assistant, equipped with advanced medical knowledge and natural language understanding. How can I help you today?",
     selectSymptoms: "Select Symptoms",
     writeDescription: "Write or Speak",
     uploadReport: "Upload Report",
@@ -148,13 +240,15 @@ const uiTranslations = {
     cancel: "Cancel",
     askAnything: "Ask me anything about your health...",
     tellHealth: "Tell Me About Your Health",
-    describeFeeling: "Select your symptoms or describe how you're feeling in simple words.",
+    describeFeeling:
+      "Select your symptoms or describe how you're feeling in simple words.",
     capabilities: "Capabilities",
     accuracy: "Accuracy",
     whatCanYouDo: "What can you help me with?",
     howAccurate: "How do you ensure medical accuracy?",
     analyzing: "Analyzing your request...",
-    pleaseDescribeSymptoms: "Please describe your symptoms or select from the common symptoms",
+    pleaseDescribeSymptoms:
+      "Please describe your symptoms or select from the common symptoms",
     whatIUnderstand: "What I Understand",
     importantFindings: "Important Findings",
     whatThisMightBe: "What This Might Be",
@@ -162,11 +256,13 @@ const uiTranslations = {
     whenToSeeDoctor: "When to See a Doctor",
     needsImmediateAttention: "This needs immediate medical attention",
     shouldSeeDoctor: "You should see a doctor soon",
-    canTreatAtHome: "You can treat this at home but see a doctor if it gets worse"
+    canTreatAtHome:
+      "You can treat this at home but see a doctor if it gets worse",
   },
   es: {
     welcomeTitle: "Asistente de Salud IA",
-    welcomeDescription: "Soy tu Asistente Médico IA, equipado con conocimientos médicos avanzados y comprensión del lenguaje natural. ¿Cómo puedo ayudarte hoy?",
+    welcomeDescription:
+      "Soy tu Asistente Médico IA, equipado con conocimientos médicos avanzados y comprensión del lenguaje natural. ¿Cómo puedo ayudarte hoy?",
     selectSymptoms: "Seleccionar Síntomas",
     writeDescription: "Escribir o Hablar",
     uploadReport: "Subir Informe",
@@ -176,13 +272,15 @@ const uiTranslations = {
     cancel: "Cancelar",
     askAnything: "Pregúntame cualquier cosa sobre tu salud...",
     tellHealth: "Cuéntame sobre tu Salud",
-    describeFeeling: "Selecciona tus síntomas o describe cómo te sientes en palabras simples.",
+    describeFeeling:
+      "Selecciona tus síntomas o describe cómo te sientes en palabras simples.",
     capabilities: "Capacidades",
     accuracy: "Precisión",
     whatCanYouDo: "¿En qué puedes ayudarme?",
     howAccurate: "¿Cómo aseguras la precisión médica?",
     analyzing: "Analizando su consulta...",
-    pleaseDescribeSymptoms: "Por favor describe tus síntomas o selecciona de los síntomas comunes",
+    pleaseDescribeSymptoms:
+      "Por favor describe tus síntomas o selecciona de los síntomas comunes",
     whatIUnderstand: "Lo que Entiendo",
     importantFindings: "Hallazgos Importantes",
     whatThisMightBe: "Qué Podría Ser",
@@ -190,11 +288,13 @@ const uiTranslations = {
     whenToSeeDoctor: "Cuándo Ver al Médico",
     needsImmediateAttention: "Esto necesita atención médica inmediata",
     shouldSeeDoctor: "Deberías ver a un médico pronto",
-    canTreatAtHome: "Puedes tratarlo en casa pero consulta al médico si empeora"
+    canTreatAtHome:
+      "Puedes tratarlo en casa pero consulta al médico si empeora",
   },
   hi: {
     welcomeTitle: "एआई स्वास्थ्य सहायक",
-    welcomeDescription: "मैं आपका एआई डॉक्टर सहायक हूं, उन्नत चिकित्सा ज्ञान और प्राकृतिक भाषा समझ से लैस। मैं आज आपकी कैसे मदद कर सकता हूं?",
+    welcomeDescription:
+      "मैं आपका एआई डॉक्टर सहायक हूं, उन्नत चिकित्सा ज्ञान और प्राकृतिक भाषा समझ से लैस। मैं आज आपकी कैसे मदद कर सकता हूं?",
     selectSymptoms: "लक्षण चुनें",
     writeDescription: "लिखें या बोलें",
     uploadReport: "रिपोर्ट अपलोड करें",
@@ -210,7 +310,8 @@ const uiTranslations = {
     whatCanYouDo: "आप मेरी कैसे मदद कर सकते हैं?",
     howAccurate: "आप चिकित्सा सटीकता कैसे सुनिश्चित करते हैं?",
     analyzing: "आपके प्रश्न का विश्लेषण कर रहा हूं...",
-    pleaseDescribeSymptoms: "कृपया अपने लक्षणों का वर्णन करें या सामान्य लक्षणों में से चुनें",
+    pleaseDescribeSymptoms:
+      "कृपया अपने लक्षणों का वर्णन करें या सामान्य लक्षणों में से चुनें",
     whatIUnderstand: "मैं क्या समझता हूं",
     importantFindings: "महत्वपूर्ण निष्कर्ष",
     whatThisMightBe: "यह क्या हो सकता है",
@@ -218,7 +319,8 @@ const uiTranslations = {
     whenToSeeDoctor: "डॉक्टर को कब दिखाएं",
     needsImmediateAttention: "इसे तत्काल चिकित्सा ध्यान की आवश्यकता है",
     shouldSeeDoctor: "आपको जल्द ही डॉक्टर को दिखाना चाहिए",
-    canTreatAtHome: "आप इसका घर पर इलाज कर सकते हैं लेकिन अगर स्थिति बिगड़े तो डॉक्टर को दिखाएं"
+    canTreatAtHome:
+      "आप इसका घर पर इलाज कर सकते हैं लेकिन अगर स्थिति बिगड़े तो डॉक्टर को दिखाएं",
   },
   // Add more languages as needed
 };
@@ -241,7 +343,10 @@ const AiDoctor = () => {
   const recordingTimerRef = useRef(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [showSymptomSelector, setShowSymptomSelector] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(languages[0]);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(
+    languages[0]
+  );
+  const [focus, setFocus] = useState<boolean>(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: (result: string) => {
@@ -249,70 +354,79 @@ const AiDoctor = () => {
       setVoiceText(result);
     },
     onError: (error: Error) => {
-      console.error('Speech recognition error:', error);
-      
+      console.error("Speech recognition error:", error);
+
       // Handle specific error types
-      const errorMessage = error instanceof Error ? error.message : '';
-      let userMessage = '';
-      
-      if (errorMessage.includes('network')) {
-        userMessage = currentLanguage.code === 'en' 
-          ? "Network error: Please check your internet connection and try again."
-          : currentLanguage.code === 'es'
-          ? "Error de red: Por favor, verifique su conexión a internet e inténtelo de nuevo."
-          : currentLanguage.code === 'hi'
-          ? "नेटवर्क त्रुटि: कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।"
-          : currentLanguage.code === 'ar'
-          ? "خطأ في الشبكة: يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى."
-          : currentLanguage.code === 'zh'
-          ? "网络错误：请检查您的网络连接并重试。"
-          : "Network error: Please check your internet connection and try again.";
-      } else if (errorMessage.includes('not-allowed')) {
-        userMessage = currentLanguage.code === 'en'
-          ? "Microphone access denied. Please allow microphone access in your browser settings."
-          : currentLanguage.code === 'es'
-          ? "Acceso al micrófono denegado. Por favor, permita el acceso al micrófono en la configuración de su navegador."
-          : currentLanguage.code === 'hi'
-          ? "माइक्रोफोन एक्सेस अस्वीकृत। कृपया अपनी ब्राउ़र सेटिंग्स में माइक्रोफोन एक्सेस की अनुमति दें।"
-          : currentLanguage.code === 'ar'
-          ? "تم رفض الوصول إلى الميكروفون. يرجى السماح بالوصول إلى الميكروفون في إعدادات المتصفح."
-          : currentLanguage.code === 'zh'
-          ? "麦克风访问被拒绝。请在浏览器设置中允许麦克风访问。"
-          : "Microphone access denied. Please allow microphone access in your browser settings.";
+      const errorMessage = error instanceof Error ? error.message : "";
+      let userMessage = "";
+
+      if (errorMessage.includes("network")) {
+        userMessage =
+          currentLanguage.code === "en"
+            ? "Network error: Please check your internet connection and try again."
+            : currentLanguage.code === "es"
+            ? "Error de red: Por favor, verifique su conexión a internet e inténtelo de nuevo."
+            : currentLanguage.code === "hi"
+            ? "नेटवर्क त्रुटि: कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।"
+            : currentLanguage.code === "ar"
+            ? "خطأ في الشبكة: يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى."
+            : currentLanguage.code === "zh"
+            ? "网络错误：请检查您的网络连接并重试。"
+            : "Network error: Please check your internet connection and try again.";
+      } else if (errorMessage.includes("not-allowed")) {
+        userMessage =
+          currentLanguage.code === "en"
+            ? "Microphone access denied. Please allow microphone access in your browser settings."
+            : currentLanguage.code === "es"
+            ? "Acceso al micrófono denegado. Por favor, permita el acceso al micrófono en la configuración de su navegador."
+            : currentLanguage.code === "hi"
+            ? "माइक्रोफोन एक्सेस अस्वीकृत। कृपया अपनी ब्राउ़र सेटिंग्स में माइक्रोफोन एक्सेस की अनुमति दें।"
+            : currentLanguage.code === "ar"
+            ? "تم رفض الوصول إلى الميكروفون. يرجى السماح بالوصول إلى الميكروفون في إعدادات المتصفح."
+            : currentLanguage.code === "zh"
+            ? "麦克风访问被拒绝。请在浏览器设置中允许麦克风访问。"
+            : "Microphone access denied. Please allow microphone access in your browser settings.";
       } else {
-        userMessage = currentLanguage.code === 'en'
-          ? "Speech recognition failed. Please try again or type your message."
-          : currentLanguage.code === 'es'
-          ? "El reconocimiento de voz falló. Por favor, inténtelo de nuevo o escriba su mensaje."
-          : currentLanguage.code === 'hi'
-          ? "स्पीच रिकग्निशन विफल। कृपया पुनः प्रयास करें या अपना संदेश टाइप करें।"
-          : currentLanguage.code === 'ar'
-          ? "فشل التعرف على الكلام. يرجى المحاولة مرة أخرى أو كتابة رسالتك."
-          : currentLanguage.code === 'zh'
-          ? "语音识别失败。请重试或输入您的消息。"
-          : "Speech recognition failed. Please try again or type your message.";
+        userMessage =
+          currentLanguage.code === "en"
+            ? "Speech recognition failed. Please try again or type your message."
+            : currentLanguage.code === "es"
+            ? "El reconocimiento de voz falló. Por favor, inténtelo de nuevo o escriba su mensaje."
+            : currentLanguage.code === "hi"
+            ? "स्पीच रिकग्निशन विफल। कृपया पुनः प्रयास करें या अपना संदेश टाइप करें।"
+            : currentLanguage.code === "ar"
+            ? "فشل التعرف على الكلام. يرجى المحاولة مرة أخرى أو كتابة رسالتك."
+            : currentLanguage.code === "zh"
+            ? "语音识别失败。请重试或输入您的消息。"
+            : "Speech recognition failed. Please try again or type your message.";
       }
 
       toast.error(userMessage, {
         duration: 5000,
         action: {
-          label: currentLanguage.code === 'en' ? "Try Again" :
-                 currentLanguage.code === 'es' ? "Intentar de nuevo" :
-                 currentLanguage.code === 'hi' ? "पुनः प्रयास करें" :
-                 currentLanguage.code === 'ar' ? "حاول مرة اخرى" :
-                 currentLanguage.code === 'zh' ? "重试" :
-                 "Try Again",
+          label:
+            currentLanguage.code === "en"
+              ? "Try Again"
+              : currentLanguage.code === "es"
+              ? "Intentar de nuevo"
+              : currentLanguage.code === "hi"
+              ? "पुनः प्रयास करें"
+              : currentLanguage.code === "ar"
+              ? "حاول مرة اخرى"
+              : currentLanguage.code === "zh"
+              ? "重试"
+              : "Try Again",
           onClick: () => {
             stopRecording();
             setTimeout(() => {
               startRecording();
             }, 1000);
-          }
-        }
+          },
+        },
       });
-      
+
       stopRecording();
-    }
+    },
   });
 
   // Initialize Gemini API
@@ -328,7 +442,7 @@ const AiDoctor = () => {
     // Simple pattern matching for demonstration
     const bloodPressureMatch = content.match(/blood pressure.*?(\d+)/i);
     const heartRateMatch = content.match(/heart rate.*?(\d+)/i);
-    
+
     if (bloodPressureMatch || heartRateMatch) {
       const today = new Date().toLocaleDateString();
       const labels = Array.from({ length: 7 }, (_, i) => {
@@ -347,7 +461,9 @@ const AiDoctor = () => {
         data: {
           labels,
           values,
-          label: bloodPressureMatch ? "Blood Pressure (mmHg)" : "Heart Rate (BPM)",
+          label: bloodPressureMatch
+            ? "Blood Pressure (mmHg)"
+            : "Heart Rate (BPM)",
           color: bloodPressureMatch ? "#3b82f6" : "#ef4444",
         },
       };
@@ -359,33 +475,36 @@ const AiDoctor = () => {
   const translateText = async (text: string, targetLang: string) => {
     try {
       setIsTranslating(true);
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            {
-              role: "system",
-              content: `You are a medical translator. Translate the following text to ${targetLang} while preserving medical terminology and emojis. Keep the translation simple and easy to understand. Maintain the original formatting and structure.`,
-            },
-            { role: "user", content: text },
-          ],
-          temperature: 0.3,
-          max_tokens: 2048,
-          top_p: 0.9,
-          stream: false,
-          safe_mode: true,
-        }),
-      });
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              {
+                role: "system",
+                content: `You are a medical translator. Translate the following text to ${targetLang} while preserving medical terminology and emojis. Keep the translation simple and easy to understand. Maintain the original formatting and structure.`,
+              },
+              { role: "user", content: text },
+            ],
+            temperature: 0.3,
+            max_tokens: 2048,
+            top_p: 0.9,
+            stream: false,
+            safe_mode: true,
+          }),
+        }
+      );
 
       const data = await response.json();
       return data.choices[0].message.content;
     } catch (error) {
-      console.error('Translation error:', error);
+      console.error("Translation error:", error);
       return text;
     } finally {
       setIsTranslating(false);
@@ -396,7 +515,7 @@ const AiDoctor = () => {
   useEffect(() => {
     if (listening) {
       recordingTimerRef.current = setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
+        setRecordingDuration((prev) => prev + 1);
       }, 1000);
     } else {
       clearInterval(recordingTimerRef.current);
@@ -410,25 +529,30 @@ const AiDoctor = () => {
 
   const startRecording = () => {
     try {
-      listen({ 
+      listen({
         lang: currentLanguage.code,
         interimResults: true,
-        continuous: true
+        continuous: true,
       });
       setIsRecording(true);
-      
+
       toast.success(
-        currentLanguage.code === 'en' ? "Listening... Speak now"
-        : currentLanguage.code === 'es' ? "Escuchando... Hable ahora"
-        : currentLanguage.code === 'hi' ? "सुन रहा हूं... अब बोलें"
-        : currentLanguage.code === 'ar' ? "جاري الاستماع... تحدث الآن"
-        : currentLanguage.code === 'zh' ? "正在听... 请说话"
-        : "Listening... Speak now"
+        currentLanguage.code === "en"
+          ? "Listening... Speak now"
+          : currentLanguage.code === "es"
+          ? "Escuchando... Hable ahora"
+          : currentLanguage.code === "hi"
+          ? "सुन रहा हूं... अब बोलें"
+          : currentLanguage.code === "ar"
+          ? "جاري الاستماع... تحدث الآن"
+          : currentLanguage.code === "zh"
+          ? "正在听... 请说话"
+          : "Listening... Speak now"
       );
     } catch (error) {
-      console.error('Speech recognition error:', error);
+      console.error("Speech recognition error:", error);
       toast.error(
-        currentLanguage.code === 'en'
+        currentLanguage.code === "en"
           ? "Failed to start voice recognition. Please try again."
           : "Error al iniciar el reconocimiento de voz. Por favor, inténtelo de nuevo."
       );
@@ -440,7 +564,7 @@ const AiDoctor = () => {
     stop();
     setIsRecording(false);
     if (input.trim()) {
-      handleSubmit(new Event('submit') as any);
+      handleSubmit(new Event("submit") as any);
     }
   };
 
@@ -448,18 +572,22 @@ const AiDoctor = () => {
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   // Modified handleSubmit to include translation
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
+    if (isRecording) {
+      stop();
+      setIsRecording(false);
+    }
 
-    const userMessage: Message = { 
-      role: "user", 
+    const userMessage: Message = {
+      role: "user",
       content: input,
-      language: currentLanguage.code 
+      language: currentLanguage.code,
     };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -482,16 +610,19 @@ When responding:
 - Keep your responses short and clear
 - If you detect any serious conditions, clearly state in ${currentLanguage.name} that they need to see a doctor immediately
 
-Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Always use ${currentLanguage.name} language.`
+Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Always use ${currentLanguage.name} language.`,
       };
 
-      const contextMessages = messages.slice(-5).map(msg => ({
+      const contextMessages = messages.slice(-5).map((msg) => ({
         role: msg.role,
-        content: msg.content
+        content: msg.content,
       }));
 
       // Initialize Groq client
-      const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY ,dangerouslyAllowBrowser: true });
+      const groq = new Groq({
+        apiKey: import.meta.env.VITE_GROQ_API_KEY,
+        dangerouslyAllowBrowser: true,
+      });
 
       // Start the API call
       const responsePromise = groq.chat.completions.create({
@@ -501,38 +632,38 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
           ...contextMessages,
           {
             role: "user",
-            content: input
-          }
+            content: input,
+          },
         ],
         temperature: 0.5,
-          max_tokens: 2048,
-          top_p: 0.9,
-          stream: false
+        max_tokens: 2048,
+        top_p: 0.9,
+        stream: false,
       });
 
       // Create a delay promise for minimum animation time (8 seconds)
-      const delayPromise = new Promise(resolve => setTimeout(resolve, 8000));
+      const delayPromise = new Promise((resolve) => setTimeout(resolve, 8000));
 
       // Wait for both the API response and the minimum delay
       const [response] = await Promise.all([responsePromise, delayPromise]);
 
       if (!response?.choices?.[0]?.message?.content) {
-        throw new Error('Invalid response format from API');
+        throw new Error("Invalid response format from API");
       }
 
       const data = response;
-      
+
       if (!data?.choices?.[0]?.message?.content) {
-        throw new Error('Invalid response format from API');
+        throw new Error("Invalid response format from API");
       }
 
       // Add an additional small delay before showing the response
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const assistantMessage: Message = {
         role: "assistant",
         content: data.choices[0].message.content,
-        language: currentLanguage.code
+        language: currentLanguage.code,
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
@@ -543,9 +674,10 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
       }
     } catch (error) {
       console.error("Error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to get a response";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to get a response";
       toast.error(errorMessage);
-      
+
       // Translate error message based on current language
       const errorMessages = {
         en: `I apologize, but I'm having trouble responding right now. Please try again in a moment or rephrase your question.\n\nIf you're experiencing urgent health concerns, please contact your healthcare provider directly.`,
@@ -554,31 +686,34 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
         ar: `عذراً، لكنني أواجه مشكلة في الرد حالياً. يرجى المحاولة مرة اخرى بعد قليل أو إعادة صياغة سؤالك.\n\nإذا كنت تعاني من مشاكل صحية عاجلة، يرجى الاتصال بمقدم الرعاية الصحية مباشرة.`,
         zh: `抱歉，我现在回答有困难。请稍后重试或重新表述您的问题。\n\n如果您有紧急健康问题，请直接联系您的医疗服务提供者。`,
       };
-      
-      setMessages((prev) => [...prev, {
-        role: "assistant",
-        content: errorMessages[currentLanguage.code] || errorMessages.en,
-        language: currentLanguage.code
-      }]);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: errorMessages[currentLanguage.code] || errorMessages.en,
+          language: currentLanguage.code,
+        },
+      ]);
     } finally {
       // Add a final delay before removing loading state
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setIsLoading(false);
     }
   };
 
   const handleSymptomSelect = (symptomId: string) => {
-    setSelectedSymptoms(prev => {
+    setSelectedSymptoms((prev) => {
       const newSymptoms = prev.includes(symptomId)
-        ? prev.filter(id => id !== symptomId)
+        ? prev.filter((id) => id !== symptomId)
         : [...prev, symptomId];
-      
+
       // Automatically create a description from selected symptoms
       const description = commonSymptoms
-        .filter(symptom => newSymptoms.includes(symptom.id))
-        .map(symptom => symptom.description)
+        .filter((symptom) => newSymptoms.includes(symptom.id))
+        .map((symptom) => symptom.description)
         .join(". ");
-      
+
       setReportText(description);
       return newSymptoms;
     });
@@ -586,21 +721,22 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
 
   const analyzeReport = async () => {
     if (!reportText.trim() && selectedSymptoms.length === 0) {
-      toast.error(t('pleaseDescribeSymptoms'));
+      toast.error(t("pleaseDescribeSymptoms"));
       return;
     }
 
-    const symptomsText = selectedSymptoms.length > 0
-      ? getLocalizedSymptoms()
-          .filter(symptom => selectedSymptoms.includes(symptom.id))
-          .map(symptom => symptom.label)
-          .join(", ")
-      : "";
+    const symptomsText =
+      selectedSymptoms.length > 0
+        ? getLocalizedSymptoms()
+            .filter((symptom) => selectedSymptoms.includes(symptom.id))
+            .map((symptom) => symptom.label)
+            .join(", ")
+        : "";
 
     const userMessage: Message = {
       role: "user",
       content: `Please analyze these symptoms and provide a simple explanation:\n\n${symptomsText}\n${reportText}`,
-      language: currentLanguage.code
+      language: currentLanguage.code,
     };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -611,37 +747,48 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
     try {
       const systemMessage = {
         role: "system",
-        content: `You are a friendly and caring AI health assistant. IMPORTANT: You MUST respond in ${currentLanguage.name} language ONLY.
+        content: `You are a friendly and caring AI health assistant. IMPORTANT: You MUST respond in ${
+          currentLanguage.name
+        } language ONLY.
 
 When analyzing symptoms:
 - Use ${currentLanguage.name} language for ALL responses
 - Use simple, easy-to-understand words in ${currentLanguage.name}
-- If you must use medical terms, explain them in simple ${currentLanguage.name} words in parentheses
+- If you must use medical terms, explain them in simple ${
+          currentLanguage.name
+        } words in parentheses
 - Break down your response into these sections using emojis:
-  * 🔍 ${t('whatIUnderstand')}
-  * ❗ ${t('importantFindings')}
-  * 🏥 ${t('whatThisMightBe')}
-  * 👉 ${t('whatToDoNext')}
-  * ⚠️ ${t('whenToSeeDoctor')}
+  * 🔍 ${t("whatIUnderstand")}
+  * ❗ ${t("importantFindings")}
+  * 🏥 ${t("whatThisMightBe")}
+  * 👉 ${t("whatToDoNext")}
+  * ⚠️ ${t("whenToSeeDoctor")}
 - Rate the urgency in ${currentLanguage.name} using simple terms like:
-  * "${t('needsImmediateAttention')}"
-  * "${t('shouldSeeDoctor')}"
-  * "${t('canTreatAtHome')}"
+  * "${t("needsImmediateAttention")}"
+  * "${t("shouldSeeDoctor")}"
+  * "${t("canTreatAtHome")}"
 - Give practical advice that anyone can follow
 - Use friendly, reassuring language in ${currentLanguage.name}
 - Always remind that you're an AI and they should consult real doctors
 - Keep your responses short and clear
-- If you detect any serious conditions, clearly state in ${currentLanguage.name} that they need to see a doctor immediately
+- If you detect any serious conditions, clearly state in ${
+          currentLanguage.name
+        } that they need to see a doctor immediately
 
-Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Always use ${currentLanguage.name} language.`
+Remember: NEVER respond in English unless ${
+          currentLanguage.code
+        } is 'en'. Always use ${currentLanguage.name} language.`,
       };
 
-      const contextMessages = messages.slice(-5).map(msg => ({
+      const contextMessages = messages.slice(-5).map((msg) => ({
         role: msg.role,
-        content: msg.content
+        content: msg.content,
       }));
 
-      const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY, dangerouslyAllowBrowser: true });
+      const groq = new Groq({
+        apiKey: import.meta.env.VITE_GROQ_API_KEY,
+        dangerouslyAllowBrowser: true,
+      });
 
       const response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
@@ -650,29 +797,29 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
           ...contextMessages,
           {
             role: "user",
-            content: `Please analyze these symptoms and provide a simple explanation in ${currentLanguage.name}:\n\n${symptomsText}\n${reportText}`
-          }
+            content: `Please analyze these symptoms and provide a simple explanation in ${currentLanguage.name}:\n\n${symptomsText}\n${reportText}`,
+          },
         ],
         temperature: 0.5,
         max_tokens: 2048,
         top_p: 0.9,
-        stream: false
+        stream: false,
       });
 
       if (!response?.choices?.[0]?.message?.content) {
-        throw new Error('Invalid response format from API');
+        throw new Error("Invalid response format from API");
       }
 
       const data = response;
-      
+
       if (!data?.choices?.[0]?.message?.content) {
-        throw new Error('Invalid response format from API');
+        throw new Error("Invalid response format from API");
       }
 
       const assistantMessage: Message = {
         role: "assistant",
         content: data.choices[0].message.content,
-        language: currentLanguage.code
+        language: currentLanguage.code,
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
@@ -683,9 +830,10 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
       }
     } catch (error) {
       console.error("Error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to analyze symptoms";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to analyze symptoms";
       toast.error(errorMessage);
-      
+
       // Translate error message based on current language
       const errorMessages = {
         en: `I apologize, but I'm having trouble analyzing your symptoms right now. Please try again in a moment.\n\nIf you're experiencing severe symptoms or urgent health concerns, please contact your healthcare provider immediately.`,
@@ -694,12 +842,15 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
         ar: `عذراً، لكنني أواجه مشكلة في تحليل أعراضك حالياً. يرجى المحاولة مرة أخرى بعد قليل.\n\nإذا كنت تعاني من أعراض شديدة أو مشاكل صحية عاجلة، يرجى الاتصال بمقدم الرعاية الصحية فوراً.`,
         zh: `抱歉，我现在无法分析您的症状。请稍后重试。\n\n如果您出现严重症状或紧急健康问题，请立即联系您的医疗服务提供者。`,
       };
-      
-      setMessages((prev) => [...prev, {
-        role: "assistant",
-        content: errorMessages[currentLanguage.code] || errorMessages.en,
-        language: currentLanguage.code
-      }]);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: errorMessages[currentLanguage.code] || errorMessages.en,
+          language: currentLanguage.code,
+        },
+      ]);
     } finally {
       setIsLoading(false);
       setReportText("");
@@ -711,68 +862,70 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
   const processFileWithGemini = async (file: File) => {
     try {
       setIsProcessingFile(true);
-      
+
       // For PDF files
-      if (file.type === 'application/pdf') {
+      if (file.type === "application/pdf") {
         const reader = new FileReader();
         reader.onload = async (e) => {
           try {
             const arrayBuffer = e.target?.result as ArrayBuffer;
             const text = await extractTextFromPDF(arrayBuffer);
-            
+
             // Process text with Gemini
             const model = genAI.getGenerativeModel({ model: "gemini-pro" });
             const prompt = `Analyze this medical report and provide a summary in ${currentLanguage.name}:\n\n${text}`;
-            
+
             const result = await model.generateContent(prompt);
             const response = await result.response;
             const summary = response.text();
-            
+
             setReportText(summary);
-            toast.success('Report processed successfully');
+            toast.success("Report processed successfully");
           } catch (error) {
-            console.error('Error processing PDF:', error);
-            toast.error('Failed to process PDF file');
+            console.error("Error processing PDF:", error);
+            toast.error("Failed to process PDF file");
           }
         };
         reader.readAsArrayBuffer(file);
-      } 
+      }
       // For image files
-      else if (file.type.startsWith('image/')) {
+      else if (file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onload = async (e) => {
           try {
             const base64Image = e.target?.result as string;
-            
+
             // Process image with Gemini 1.5 Flash
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const model = genAI.getGenerativeModel({
+              model: "gemini-1.5-flash",
+            });
             const prompt = `Analyze this medical image and provide a summary in ${currentLanguage.name}. Focus on any visible medical conditions, abnormalities, or important details.`;
-            
+
             const result = await model.generateContent([
               prompt,
               {
                 inlineData: {
                   mimeType: file.type,
-                  data: base64Image.split(',')[1]
-                }
-              }
+                  data: base64Image.split(",")[1],
+                },
+              },
             ]);
-            
+
             const response = await result.response;
             const summary = response.text();
-            
+
             setReportText(summary);
-            toast.success('Image processed successfully');
+            toast.success("Image processed successfully");
           } catch (error) {
-            console.error('Error processing image:', error);
-            toast.error('Failed to process image');
+            console.error("Error processing image:", error);
+            toast.error("Failed to process image");
           }
         };
         reader.readAsDataURL(file);
       }
     } catch (error) {
-      console.error('Error processing file:', error);
-      toast.error('Failed to process file');
+      console.error("Error processing file:", error);
+      toast.error("Failed to process file");
     } finally {
       setIsProcessingFile(false);
     }
@@ -784,12 +937,18 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
     await processFileWithGemini(file);
   };
 
-  const extractTextFromPDF = async (arrayBuffer: ArrayBuffer): Promise<string> => {
+  const extractTextFromPDF = async (
+    arrayBuffer: ArrayBuffer
+  ): Promise<string> => {
     // This is a placeholder. In a real implementation, you would:
     // 1. Either use pdf.js in the browser
     // 2. Or better, send the file to your server for processing
     return new Promise((resolve) => {
-      resolve('PDF uploaded: ' + uploadedFile?.name + '\n\nPlease paste the report text manually for now.');
+      resolve(
+        "PDF uploaded: " +
+          uploadedFile?.name +
+          "\n\nPlease paste the report text manually for now."
+      );
     });
   };
 
@@ -802,13 +961,19 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
   };
 
   const validateAndUploadFile = (file: File) => {
-    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    const validTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
     if (!validTypes.includes(file.type)) {
-      toast.error('Please upload a PDF or image file (JPEG, PNG, WEBP)');
+      toast.error("Please upload a PDF or image file (JPEG, PNG, WEBP)");
       return;
     }
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      toast.error('File size should be less than 10MB');
+    if (file.size > 10 * 1024 * 1024) {
+      // 10MB limit
+      toast.error("File size should be less than 10MB");
       return;
     }
     handleFileUpload(file);
@@ -818,7 +983,11 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
   const LanguageSelector = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="w-auto px-3 flex gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          className="w-auto px-3 flex gap-2"
+        >
           <Globe2 className="h-4 w-4" />
           <span>{currentLanguage.flag}</span>
         </Button>
@@ -845,7 +1014,7 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
       window.speechSynthesis.cancel();
     }
     // Translate the UI elements that are currently visible
-    if (newLanguage.code !== 'en') {
+    if (newLanguage.code !== "en") {
       setIsTranslating(true);
       // Translate relevant UI elements
       setIsTranslating(false);
@@ -853,26 +1022,34 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
   };
 
   const t = (key: string) => {
-    const translations = uiTranslations[currentLanguage.code] || uiTranslations.en;
+    const translations =
+      uiTranslations[currentLanguage.code] || uiTranslations.en;
     return translations[key] || uiTranslations.en[key];
   };
 
   const getLocalizedSymptoms = () => {
-    return commonSymptomsTranslations[currentLanguage.code] || commonSymptomsTranslations.en;
+    return (
+      commonSymptomsTranslations[currentLanguage.code] ||
+      commonSymptomsTranslations.en
+    );
   };
 
   return (
     <MainLayout>
       <div className="flex-1 overflow-hidden bg-background/50">
         <div className="mb-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold primary-grad">{t('welcomeTitle')}</h1>
+          <h1 className="text-3xl font-bold primary-grad">
+            {t("welcomeTitle")}
+          </h1>
           <LanguageSelector />
         </div>
 
-        <Card className={cn(
-          "h-[calc(100vh-12rem)] flex flex-col backdrop-blur-sm bg-background/50 border-primary/20",
-          currentLanguage.rtl && "rtl"
-        )}>
+        <Card
+          className={cn(
+            "h-[calc(100vh-12rem)] flex flex-col backdrop-blur-sm bg-background/50 border-primary/20",
+            currentLanguage.rtl && "rtl"
+          )}
+        >
           <ScrollArea className="flex-1 p-4 space-y-4" ref={scrollAreaRef}>
             <AnimatePresence>
               {showWelcome && (
@@ -888,7 +1065,7 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                       loop
                       speed={0.5}
                       src="https://assets5.lottiefiles.com/packages/lf20_xyadoh9h.json"
-                      style={{ width: '100%', height: '100%' }}
+                      style={{ width: "100%", height: "100%" }}
                     />
                     <motion.div
                       className="absolute -inset-4 bg-primary/10 rounded-full z-[-1]"
@@ -903,22 +1080,33 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                       }}
                     />
                   </div>
-                  <h2 className="text-2xl font-bold text-primary">{t('welcomeTitle')}</h2>
+                  <h2 className="text-2xl font-bold text-primary">
+                    {t("welcomeTitle")}
+                  </h2>
                   <p className="text-muted-foreground">
-                    {t('welcomeDescription')}
+                    {t("welcomeDescription")}
                   </p>
                   <div className="flex gap-4 justify-center flex-wrap">
-                    <Button variant="outline" onClick={() => setShowReportDialog(true)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowReportDialog(true)}
+                    >
                       <Upload className="w-4 h-4 mr-2" />
-                      {t('uploadReport')}
+                      {t("uploadReport")}
                     </Button>
-                    <Button variant="outline" onClick={() => setInput(t('whatCanYouDo'))}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setInput(t("whatCanYouDo"))}
+                    >
                       <Brain className="w-4 h-4 mr-2" />
-                      {t('capabilities')}
+                      {t("capabilities")}
                     </Button>
-                    <Button variant="outline" onClick={() => setInput(t('howAccurate'))}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setInput(t("howAccurate"))}
+                    >
                       <Activity className="w-4 h-4 mr-2" />
-                      {t('accuracy')}
+                      {t("accuracy")}
                     </Button>
                   </div>
                 </motion.div>
@@ -931,10 +1119,12 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
                   className={`flex gap-3 mb-6 ${
-                    message.role === "assistant" ? "flex-row" : "flex-row-reverse"
+                    message.role === "assistant"
+                      ? "flex-row"
+                      : "flex-row-reverse"
                   }`}
                 >
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.2 }}
@@ -947,7 +1137,10 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                     )}
                   </motion.div>
                   <motion.div
-                    initial={{ x: message.role === "assistant" ? -20 : 20, opacity: 0 }}
+                    initial={{
+                      x: message.role === "assistant" ? -20 : 20,
+                      opacity: 0,
+                    }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.3, delay: 0.1 }}
                     className={`rounded-lg px-6 py-4 max-w-[85%] backdrop-blur-sm ${
@@ -980,47 +1173,47 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                       className="absolute inset-0 bg-primary/20 rounded-full"
                       animate={{
                         scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.6, 0.3]
+                        opacity: [0.3, 0.6, 0.3],
                       }}
                       transition={{
                         duration: 2,
                         repeat: Infinity,
-                        ease: "easeInOut"
+                        ease: "easeInOut",
                       }}
-                      style={{ transformOrigin: 'center' }}
+                      style={{ transformOrigin: "center" }}
                     />
                     <motion.div
                       className="absolute inset-0 border-2 border-primary rounded-full"
                       animate={{
                         rotate: 360,
-                        scale: [1, 1.1, 1]
+                        scale: [1, 1.1, 1],
                       }}
                       transition={{
                         rotate: {
                           duration: 3,
                           repeat: Infinity,
-                          ease: "linear"
+                          ease: "linear",
                         },
                         scale: {
                           duration: 2,
                           repeat: Infinity,
-                          ease: "easeInOut"
-                        }
+                          ease: "easeInOut",
+                        },
                       }}
-                      style={{ transformOrigin: 'center' }}
+                      style={{ transformOrigin: "center" }}
                     />
                     <motion.div
                       className="absolute inset-2 bg-primary/10 rounded-full flex items-center justify-center"
                       animate={{
                         scale: [0.8, 1, 0.8],
-                        opacity: [0.5, 1, 0.5]
+                        opacity: [0.5, 1, 0.5],
                       }}
                       transition={{
                         duration: 2,
                         repeat: Infinity,
-                        ease: "easeInOut"
+                        ease: "easeInOut",
                       }}
-                      style={{ transformOrigin: 'center' }}
+                      style={{ transformOrigin: "center" }}
                     >
                       <Brain className="w-5 h-5 text-primary" />
                     </motion.div>
@@ -1029,34 +1222,39 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">
-                          {currentLanguage.code === 'en' ? 'AI Doctor is analyzing your request...' :
-                           currentLanguage.code === 'es' ? 'El Doctor IA está analizando su consulta...' :
-                           currentLanguage.code === 'hi' ? 'एआई डॉक्टर आपके प्रश्न का विश्लेषण कर रहा है...' :
-                           currentLanguage.code === 'ar' ? 'الطبيب الذكي يحلل طلبك...' :
-                           currentLanguage.code === 'zh' ? 'AI医生正在分析您的请求...' :
-                           'AI Doctor is analyzing your request...'}
+                          {currentLanguage.code === "en"
+                            ? "AI Doctor is analyzing your request..."
+                            : currentLanguage.code === "es"
+                            ? "El Doctor IA está analizando su consulta..."
+                            : currentLanguage.code === "hi"
+                            ? "एआई डॉक्टर आपके प्रश्न का विश्लेषण कर रहा है..."
+                            : currentLanguage.code === "ar"
+                            ? "الطبيب الذكي يحلل طلبك..."
+                            : currentLanguage.code === "zh"
+                            ? "AI医生正在分析您的请求..."
+                            : "AI Doctor is analyzing your request..."}
                         </span>
                         <motion.div
                           className="w-6 h-6 relative"
                           animate={{
-                            rotate: 360
+                            rotate: 360,
                           }}
                           transition={{
                             duration: 2,
                             repeat: Infinity,
-                            ease: "linear"
+                            ease: "linear",
                           }}
                         >
                           <motion.div
                             className="absolute inset-0 border-2 border-primary/50 rounded-full border-t-transparent"
                             animate={{
                               scale: [1, 1.2, 1],
-                              opacity: [0.5, 1, 0.5]
+                              opacity: [0.5, 1, 0.5],
                             }}
                             transition={{
                               duration: 1.5,
                               repeat: Infinity,
-                              ease: "easeInOut"
+                              ease: "easeInOut",
                             }}
                           />
                         </motion.div>
@@ -1065,24 +1263,24 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                         <motion.div
                           className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 via-primary to-violet-500"
                           animate={{
-                            width: ['0%', '100%'],
-                            x: ['-100%', '100%']
+                            width: ["0%", "100%"],
+                            x: ["-100%", "100%"],
                           }}
                           transition={{
                             duration: 2.5,
                             repeat: Infinity,
-                            ease: "easeInOut"
+                            ease: "easeInOut",
                           }}
                         />
                         <motion.div
                           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                           animate={{
-                            x: ['-100%', '100%']
+                            x: ["-100%", "100%"],
                           }}
                           transition={{
                             duration: 1.5,
                             repeat: Infinity,
-                            ease: "linear"
+                            ease: "linear",
                           }}
                         />
                       </div>
@@ -1111,7 +1309,7 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
             className="border-t border-primary/20 mt-4 pt-4 bg-background/80 backdrop-blur-sm"
           >
             <form onSubmit={handleSubmit} className="p-4 flex gap-3">
-              <div className="flex-1 flex gap-3">
+              <div className="flex-1 flex gap-3 relative">
                 <Button
                   type="button"
                   variant="outline"
@@ -1133,10 +1331,12 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                       listening ? "scale-110" : "hover:scale-105"
                     )}
                   >
-                    <Mic className={cn(
-                      "h-4 w-4",
-                      listening && "text-white animate-pulse"
-                    )} />
+                    <Mic
+                      className={cn(
+                        "h-4 w-4",
+                        listening && "text-white animate-pulse"
+                      )}
+                    />
                   </Button>
                   {listening && (
                     <motion.div
@@ -1151,31 +1351,40 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={listening ? 
-                    (currentLanguage.code === 'en' ? "Listening... Speak now"
-                    : currentLanguage.code === 'es' ? "Escuchando... Hable ahora"
-                    : currentLanguage.code === 'hi' ? "सुन रहा हूं... अब बोलें"
-                    : currentLanguage.code === 'ar' ? "جاري الاستماع... تحدث الآن"
-                    : currentLanguage.code === 'zh' ? "正在听... 请说话"
-                    : "Listening... Speak now")
-                    : t('askAnything')
+                  placeholder={
+                    listening
+                      ? currentLanguage.code === "en"
+                        ? "Listening... Speak now"
+                        : currentLanguage.code === "es"
+                        ? "Escuchando... Hable ahora"
+                        : currentLanguage.code === "hi"
+                        ? "सुन रहा हूं... अब बोलें"
+                        : currentLanguage.code === "ar"
+                        ? "جاري الاستماع... تحدث الآن"
+                        : currentLanguage.code === "zh"
+                        ? "正在听... 请说话"
+                        : "Listening... Speak now"
+                      : t("askAnything")
                   }
                   disabled={isLoading}
+                  onFocus={() => setFocus(true)}
+                  onBlur={() => setFocus(false)}
                   className={cn(
                     "flex-1 bg-card/50 backdrop-blur-sm border-primary/20 focus:ring-2 ring-primary/20 transition-all",
                     currentLanguage.rtl && "text-right",
-                    listening && "border-red-500/50 ring-red-500/20"
+                    listening && "border-red-500/50 ring-red-500/20",
+                    focus ? "absolute md:relative" : "relative"
                   )}
                   dir={currentLanguage.rtl ? "rtl" : "ltr"}
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isLoading || (listening && !voiceText.trim())}
                 className="hover:scale-105 transition-transform"
               >
-                <Send className="w-4 h-4 mr-2" />
-                {t('checkHealth')}
+                <Send className="w-4 h-4 mr-0 md:mr-2" />
+                <h4 className="md:flex hidden">{t("checkHealth")}</h4>
               </Button>
             </form>
           </motion.div>
@@ -1185,42 +1394,51 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
         <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
-              <DialogTitle>{t('tellHealth')}</DialogTitle>
-              <DialogDescription>
-                {t('describeFeeling')}
-              </DialogDescription>
+              <DialogTitle>{t("tellHealth")}</DialogTitle>
+              <DialogDescription>{t("describeFeeling")}</DialogDescription>
             </DialogHeader>
-            
+
             <Tabs defaultValue="symptoms" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="symptoms">{t('selectSymptoms')}</TabsTrigger>
-                <TabsTrigger value="text">{t('writeDescription')}</TabsTrigger>
-                <TabsTrigger value="file">{t('uploadReport')}</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="symptoms">
+                  {t("selectSymptoms")}
+                </TabsTrigger>
+                {/* <TabsTrigger value="text">{t("writeDescription")}</TabsTrigger> */}
+                <TabsTrigger value="file">{t("uploadReport")}</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="symptoms">
                 <div className="grid grid-cols-2 gap-3 p-4">
                   {getLocalizedSymptoms().map((symptom) => (
                     <Button
                       key={symptom.id}
-                      variant={selectedSymptoms.includes(symptom.id) ? "default" : "outline"}
+                      variant={
+                        selectedSymptoms.includes(symptom.id)
+                          ? "default"
+                          : "outline"
+                      }
                       className="h-auto py-4 flex flex-col items-center gap-2"
                       onClick={() => handleSymptomSelect(symptom.id)}
                     >
                       <span className="text-2xl">{symptom.icon}</span>
-                      <span className="text-sm text-center">{symptom.label}</span>
+                      <span className="text-sm text-center">
+                        {symptom.label}
+                      </span>
                     </Button>
                   ))}
                 </div>
               </TabsContent>
-              
-              <TabsContent value="text">
+
+              {/* <TabsContent value="text">
                 <div className="space-y-4">
                   <Textarea
-                    placeholder={t('describeFeeling')}
+                    placeholder={t("describeFeeling")}
                     value={reportText}
                     onChange={(e) => setReportText(e.target.value)}
-                    className={cn("min-h-[150px]", currentLanguage.rtl && "text-right")}
+                    className={cn(
+                      "min-h-[150px]",
+                      currentLanguage.rtl && "text-right"
+                    )}
                     dir={currentLanguage.rtl ? "rtl" : "ltr"}
                   />
                   <div className="flex justify-center">
@@ -1230,13 +1448,18 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                       onClick={startRecording}
                       disabled={listening}
                     >
-                      <Mic className={cn("h-4 w-4", listening && "text-red-500 animate-pulse")} />
-                      {listening ? t('listening') : t('speak')}
+                      <Mic
+                        className={cn(
+                          "h-4 w-4",
+                          listening && "text-red-500 animate-pulse"
+                        )}
+                      />
+                      {listening ? t("listening") : t("speak")}
                     </Button>
                   </div>
                 </div>
-              </TabsContent>
-              
+              </TabsContent> */}
+
               <TabsContent value="file">
                 <div
                   className={cn(
@@ -1257,7 +1480,7 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                       if (file) validateAndUploadFile(file);
                     }}
                   />
-                  
+
                   {isProcessingFile ? (
                     <div className="flex flex-col items-center gap-2">
                       <Player
@@ -1265,14 +1488,16 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                         loop
                         speed={0.5}
                         src="https://assets10.lottiefiles.com/packages/lf20_p8bfn5to.json"
-                        style={{ height: '100px' }}
+                        style={{ height: "100px" }}
                       />
-                      <p className="text-sm text-muted-foreground">Processing file...</p>
+                      <p className="text-sm text-muted-foreground">
+                        Processing file...
+                      </p>
                     </div>
                   ) : uploadedFile ? (
                     <div className="flex flex-col items-center gap-4">
                       <div className="flex items-center gap-2">
-                        {uploadedFile.type === 'application/pdf' ? (
+                        {uploadedFile.type === "application/pdf" ? (
                           <FileText className="h-8 w-8 text-primary" />
                         ) : (
                           <ImageIcon className="h-8 w-8 text-primary" />
@@ -1285,7 +1510,7 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                         onClick={(e) => {
                           e.stopPropagation();
                           setUploadedFile(null);
-                          setReportText('');
+                          setReportText("");
                         }}
                       >
                         <X className="h-4 w-4 mr-2" />
@@ -1295,8 +1520,12 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <Upload className="h-8 w-8 text-primary mb-2" />
-                      <p className="text-sm font-medium">Click to upload or drag and drop</p>
-                      <p className="text-xs text-muted-foreground">PDF or Image (max 10MB)</p>
+                      <p className="text-sm font-medium">
+                        Click to upload or drag and drop
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        PDF or Image (max 10MB)
+                      </p>
                     </div>
                   )}
                 </div>
@@ -1304,21 +1533,27 @@ Remember: NEVER respond in English unless ${currentLanguage.code} is 'en'. Alway
             </Tabs>
 
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => {
-                setShowReportDialog(false);
-                setUploadedFile(null);
-                setReportText("");
-                setSelectedSymptoms([]);
-              }}>
-                {t('cancel')}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowReportDialog(false);
+                  setUploadedFile(null);
+                  setReportText("");
+                  setSelectedSymptoms([]);
+                }}
+              >
+                {t("cancel")}
               </Button>
-              <Button 
-                onClick={analyzeReport} 
-                disabled={(!reportText.trim() && selectedSymptoms.length === 0) || isProcessingFile}
+              <Button
+                onClick={analyzeReport}
+                disabled={
+                  (!reportText.trim() && selectedSymptoms.length === 0) ||
+                  isProcessingFile
+                }
                 className="gap-2"
               >
                 <Activity className="h-4 w-4" />
-                {t('checkHealth')}
+                {t("checkHealth")}
               </Button>
             </div>
           </DialogContent>

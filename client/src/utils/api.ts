@@ -1,9 +1,13 @@
 import axios from "axios";
 import { getToken } from "../hooks/auth"; // Import function to get stored token
 
+const BASE_PRL = import.meta.env.VITE_BASE_URL;
+const BASE_LRL = import.meta.env.VITE_BASE_LRL;
+
+const BASE_URL = BASE_LRL || BASE_PRL;
 // Create an Axios instance
 const api = axios.create({
-  baseURL: "http://localhost:8000/api", // Backend URL with /api prefix
+  baseURL: BASE_URL, // Backend URL
 });
 
 // Attach token dynamically to every request

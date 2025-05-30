@@ -51,32 +51,32 @@ const UserSchema = new Schema(
           reportedAt: { type: Date, default: Date.now },
         },
       ],
+      preventiveHealth: [
+        {
+          checkupType: String,
+          lastChecked: Date,
+          nextCheckup: Date,
+        },
+      ],
     },
 
-    // Consultations
-    consultations: [
+    // Appointments
+    appointments: [
       {
-        doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor" },
-        specialization: String,
-        condition: String,
+        doctorName: String,
+        doctorId: mongoose.Schema.Types.ObjectId,
+        specialty: String,
         dateTime: Date,
-        status: { 
-          type: String, 
-          enum: ["Scheduled", "Completed", "Cancelled", "In Progress"],
-          default: "Scheduled"
-        },
-        fees: Number,
-        rating: { type: Number, min: 1, max: 5 },
-        review: String,
-        followUp: Date,
-        prescriptions: [{
-          medicine: String,
-          dosage: String,
-          duration: String,
-          notes: String
-        }]
+        status: { type: String, enum: ["Scheduled", "Completed", "Cancelled"] },
       },
     ],
+
+    // Insurance Details
+    insurance: {
+      policyNumber: String,
+      provider: String,
+      validTill: Date,
+    },
 
     // Medications & Reminders
     medications: [

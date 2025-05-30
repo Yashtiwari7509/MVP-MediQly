@@ -120,10 +120,10 @@ export const dummyDoctors: Doctor[] = [
           "30-minute video consultation",
           "Basic health assessment",
           "Digital prescription",
-          "24-hour response time"
+          "24-hour response time",
         ],
         deliveryTime: "1-2 days",
-        revisions: 1
+        revisions: 1,
       },
       {
         name: "Standard",
@@ -136,10 +136,10 @@ export const dummyDoctors: Doctor[] = [
           "Digital prescription",
           "Follow-up consultation",
           "Diet recommendations",
-          "12-hour response time"
+          "12-hour response time",
         ],
         deliveryTime: "1 day",
-        revisions: 2
+        revisions: 2,
       },
       {
         name: "Premium",
@@ -153,33 +153,53 @@ export const dummyDoctors: Doctor[] = [
           "2 Follow-up consultations",
           "Detailed health report",
           "Personalized care plan",
-          "6-hour response time"
+          "6-hour response time",
         ],
         deliveryTime: "Same day",
-        revisions: 3
-      }
+        revisions: 3,
+      },
     ],
     availability: {
       status: "Available",
       nextAvailableSlot: "Today, 2:00 PM",
       responseTime: "Usually responds in 15 minutes",
       workingHours: [
-        { day: "Monday", startTime: "09:00", endTime: "17:00", isAvailable: true },
-        { day: "Wednesday", startTime: "09:00", endTime: "17:00", isAvailable: true },
-        { day: "Friday", startTime: "09:00", endTime: "17:00", isAvailable: true }
+        {
+          day: "Monday",
+          startTime: "09:00",
+          endTime: "17:00",
+          isAvailable: true,
+        },
+        {
+          day: "Wednesday",
+          startTime: "09:00",
+          endTime: "17:00",
+          isAvailable: true,
+        },
+        {
+          day: "Friday",
+          startTime: "09:00",
+          endTime: "17:00",
+          isAvailable: true,
+        },
       ],
-      instantBooking: true
+      instantBooking: true,
     },
     clinicAddress: {
       city: "Mumbai",
-      state: "Maharashtra"
+      state: "Maharashtra",
     },
     averageRating: 4.8,
     totalReviews: 124,
     isVerified: true,
-    expertise: ["Heart Surgery", "Cardiac Rehabilitation", "Preventive Cardiology"],
+    expertise: [
+      "Heart Surgery",
+      "Cardiac Rehabilitation",
+      "Preventive Cardiology",
+    ],
     languages: ["English", "Hindi", "Marathi"],
-    about: "Dr. John Smith is a renowned cardiologist with over 15 years of experience in treating heart conditions.",
+    about:
+      "Dr. John Smith is a renowned cardiologist with over 15 years of experience in treating heart conditions.",
     successRate: 98,
     totalConsultations: 1500,
     completionRate: 99,
@@ -190,9 +210,9 @@ export const dummyDoctors: Doctor[] = [
         rating: 5,
         review: "Excellent doctor, very thorough and professional",
         date: "2024-02-15",
-        serviceTier: "Premium"
-      }
-    ]
+        serviceTier: "Premium",
+      },
+    ],
   },
   {
     _id: "2",
@@ -207,41 +227,66 @@ export const dummyDoctors: Doctor[] = [
         price: 1000,
         duration: 30,
         description: "One-time video consultation with basic health assessment",
-        features: ["Video consultation", "Digital prescription", "Basic health assessment"],
+        features: [
+          "Video consultation",
+          "Digital prescription",
+          "Basic health assessment",
+        ],
         deliveryTime: "1-2 days",
-        revisions: 1
+        revisions: 1,
       },
       {
         name: "Standard",
         price: 2000,
         duration: 45,
         description: "Detailed consultation with follow-ups",
-        features: ["Extended consultation", "2 follow-ups", "Detailed health report", "Diet plan"],
+        features: [
+          "Extended consultation",
+          "2 follow-ups",
+          "Detailed health report",
+          "Diet plan",
+        ],
         deliveryTime: "1 day",
-        revisions: 2
-      }
+        revisions: 2,
+      },
     ],
     availability: {
       status: "Available",
       nextAvailableSlot: "Today, 3:00 PM",
       responseTime: "Usually responds in 20 minutes",
       workingHours: [
-        { day: "Tuesday", startTime: "10:00", endTime: "18:00", isAvailable: true },
-        { day: "Thursday", startTime: "10:00", endTime: "18:00", isAvailable: true },
-        { day: "Saturday", startTime: "09:00", endTime: "14:00", isAvailable: true }
+        {
+          day: "Tuesday",
+          startTime: "10:00",
+          endTime: "18:00",
+          isAvailable: true,
+        },
+        {
+          day: "Thursday",
+          startTime: "10:00",
+          endTime: "18:00",
+          isAvailable: true,
+        },
+        {
+          day: "Saturday",
+          startTime: "09:00",
+          endTime: "14:00",
+          isAvailable: true,
+        },
       ],
-      instantBooking: false
+      instantBooking: false,
     },
     clinicAddress: {
       city: "Delhi",
-      state: "Delhi"
+      state: "Delhi",
     },
     averageRating: 4.9,
     totalReviews: 98,
     isVerified: true,
     expertise: ["Child Healthcare", "Vaccination", "Developmental Pediatrics"],
     languages: ["English", "Hindi", "Gujarati"],
-    about: "Dr. Sarah Patel specializes in pediatric care with a focus on early childhood development.",
+    about:
+      "Dr. Sarah Patel specializes in pediatric care with a focus on early childhood development.",
     successRate: 95,
     totalConsultations: 1000,
     completionRate: 96,
@@ -252,9 +297,9 @@ export const dummyDoctors: Doctor[] = [
         rating: 5,
         review: "Great with kids, very patient and caring",
         date: "2024-02-10",
-        serviceTier: "Standard"
-      }
-    ]
+        serviceTier: "Standard",
+      },
+    ],
   },
   {
     _id: "3",
@@ -269,41 +314,66 @@ export const dummyDoctors: Doctor[] = [
         price: 1200,
         duration: 30,
         description: "One-time video consultation with basic health assessment",
-        features: ["Video consultation", "Digital prescription", "Basic health assessment"],
+        features: [
+          "Video consultation",
+          "Digital prescription",
+          "Basic health assessment",
+        ],
         deliveryTime: "1-2 days",
-        revisions: 1
+        revisions: 1,
       },
       {
         name: "Standard",
         price: 2000,
         duration: 45,
         description: "Detailed consultation with follow-ups",
-        features: ["Extended consultation", "2 follow-ups", "Detailed health report", "Diet plan"],
+        features: [
+          "Extended consultation",
+          "2 follow-ups",
+          "Detailed health report",
+          "Diet plan",
+        ],
         deliveryTime: "1 day",
-        revisions: 2
-      }
+        revisions: 2,
+      },
     ],
     availability: {
       status: "Available",
       nextAvailableSlot: "Today, 4:00 PM",
       responseTime: "Usually responds in 25 minutes",
       workingHours: [
-        { day: "Monday", startTime: "11:00", endTime: "19:00", isAvailable: true },
-        { day: "Thursday", startTime: "11:00", endTime: "19:00", isAvailable: true },
-        { day: "Saturday", startTime: "10:00", endTime: "15:00", isAvailable: true }
+        {
+          day: "Monday",
+          startTime: "11:00",
+          endTime: "19:00",
+          isAvailable: true,
+        },
+        {
+          day: "Thursday",
+          startTime: "11:00",
+          endTime: "19:00",
+          isAvailable: true,
+        },
+        {
+          day: "Saturday",
+          startTime: "10:00",
+          endTime: "15:00",
+          isAvailable: true,
+        },
       ],
-      instantBooking: false
+      instantBooking: false,
     },
     clinicAddress: {
       city: "Bangalore",
-      state: "Karnataka"
+      state: "Karnataka",
     },
     averageRating: 4.7,
     totalReviews: 76,
     isVerified: true,
     expertise: ["Cosmetic Dermatology", "Skin Cancer", "Laser Treatment"],
     languages: ["English", "Hindi", "Kannada"],
-    about: "Dr. David Kumar is an expert in treating various skin conditions and cosmetic procedures.",
+    about:
+      "Dr. David Kumar is an expert in treating various skin conditions and cosmetic procedures.",
     successRate: 90,
     totalConsultations: 800,
     completionRate: 88,
@@ -314,9 +384,9 @@ export const dummyDoctors: Doctor[] = [
         rating: 4,
         review: "Very knowledgeable and effective treatment",
         date: "2024-02-01",
-        serviceTier: "Basic"
-      }
-    ]
+        serviceTier: "Basic",
+      },
+    ],
   },
   {
     _id: "4",
@@ -331,41 +401,66 @@ export const dummyDoctors: Doctor[] = [
         price: 1800,
         duration: 30,
         description: "One-time video consultation with basic health assessment",
-        features: ["Video consultation", "Digital prescription", "Basic health assessment"],
+        features: [
+          "Video consultation",
+          "Digital prescription",
+          "Basic health assessment",
+        ],
         deliveryTime: "1-2 days",
-        revisions: 1
+        revisions: 1,
       },
       {
         name: "Standard",
         price: 3000,
         duration: 45,
         description: "Detailed consultation with follow-ups",
-        features: ["Extended consultation", "2 follow-ups", "Detailed health report", "Diet plan"],
+        features: [
+          "Extended consultation",
+          "2 follow-ups",
+          "Detailed health report",
+          "Diet plan",
+        ],
         deliveryTime: "1 day",
-        revisions: 2
-      }
+        revisions: 2,
+      },
     ],
     availability: {
       status: "Available",
       nextAvailableSlot: "Today, 5:00 PM",
       responseTime: "Usually responds in 30 minutes",
       workingHours: [
-        { day: "Tuesday", startTime: "09:00", endTime: "17:00", isAvailable: true },
-        { day: "Wednesday", startTime: "09:00", endTime: "17:00", isAvailable: true },
-        { day: "Friday", startTime: "09:00", endTime: "17:00", isAvailable: true }
+        {
+          day: "Tuesday",
+          startTime: "09:00",
+          endTime: "17:00",
+          isAvailable: true,
+        },
+        {
+          day: "Wednesday",
+          startTime: "09:00",
+          endTime: "17:00",
+          isAvailable: true,
+        },
+        {
+          day: "Friday",
+          startTime: "09:00",
+          endTime: "17:00",
+          isAvailable: true,
+        },
       ],
-      instantBooking: false
+      instantBooking: false,
     },
     clinicAddress: {
       city: "Chennai",
-      state: "Tamil Nadu"
+      state: "Tamil Nadu",
     },
     averageRating: 4.9,
     totalReviews: 112,
     isVerified: true,
     expertise: ["Stroke Treatment", "Epilepsy", "Movement Disorders"],
     languages: ["English", "Hindi", "Tamil"],
-    about: "Dr. Priya Sharma is a leading neurologist specializing in stroke treatment and epilepsy management.",
+    about:
+      "Dr. Priya Sharma is a leading neurologist specializing in stroke treatment and epilepsy management.",
     successRate: 92,
     totalConsultations: 1200,
     completionRate: 90,
@@ -376,9 +471,9 @@ export const dummyDoctors: Doctor[] = [
         rating: 5,
         review: "Excellent diagnosis and treatment plan",
         date: "2024-01-25",
-        serviceTier: "Standard"
-      }
-    ]
+        serviceTier: "Standard",
+      },
+    ],
   },
   {
     _id: "5",
@@ -393,41 +488,66 @@ export const dummyDoctors: Doctor[] = [
         price: 1600,
         duration: 30,
         description: "One-time video consultation with basic health assessment",
-        features: ["Video consultation", "Digital prescription", "Basic health assessment"],
+        features: [
+          "Video consultation",
+          "Digital prescription",
+          "Basic health assessment",
+        ],
         deliveryTime: "1-2 days",
-        revisions: 1
+        revisions: 1,
       },
       {
         name: "Standard",
         price: 2500,
         duration: 45,
         description: "Detailed consultation with follow-ups",
-        features: ["Extended consultation", "2 follow-ups", "Detailed health report", "Diet plan"],
+        features: [
+          "Extended consultation",
+          "2 follow-ups",
+          "Detailed health report",
+          "Diet plan",
+        ],
         deliveryTime: "1 day",
-        revisions: 2
-      }
+        revisions: 2,
+      },
     ],
     availability: {
       status: "Available",
       nextAvailableSlot: "Today, 6:00 PM",
       responseTime: "Usually responds in 35 minutes",
       workingHours: [
-        { day: "Monday", startTime: "10:00", endTime: "18:00", isAvailable: true },
-        { day: "Wednesday", startTime: "10:00", endTime: "18:00", isAvailable: true },
-        { day: "Thursday", startTime: "10:00", endTime: "18:00", isAvailable: true }
+        {
+          day: "Monday",
+          startTime: "10:00",
+          endTime: "18:00",
+          isAvailable: true,
+        },
+        {
+          day: "Wednesday",
+          startTime: "10:00",
+          endTime: "18:00",
+          isAvailable: true,
+        },
+        {
+          day: "Thursday",
+          startTime: "10:00",
+          endTime: "18:00",
+          isAvailable: true,
+        },
       ],
-      instantBooking: false
+      instantBooking: false,
     },
     clinicAddress: {
       city: "Hyderabad",
-      state: "Telangana"
+      state: "Telangana",
     },
     averageRating: 4.6,
     totalReviews: 89,
     isVerified: true,
     expertise: ["Joint Replacement", "Sports Injuries", "Spine Surgery"],
     languages: ["English", "Hindi", "Telugu"],
-    about: "Dr. Rahul Verma is specialized in joint replacement surgery and sports medicine.",
+    about:
+      "Dr. Rahul Verma is specialized in joint replacement surgery and sports medicine.",
     successRate: 88,
     totalConsultations: 1000,
     completionRate: 86,
@@ -438,10 +558,10 @@ export const dummyDoctors: Doctor[] = [
         rating: 5,
         review: "Great surgeon, explained everything clearly",
         date: "2024-02-05",
-        serviceTier: "Standard"
-      }
-    ]
-  }
+        serviceTier: "Standard",
+      },
+    ],
+  },
 ];
 
 const Consultation = () => {
@@ -463,26 +583,28 @@ const Consultation = () => {
       setLoading(true);
       // Simulate API call with dummy data
       setTimeout(() => {
-        const filteredDocs = dummyDoctors.filter(doc => 
-          selectedSpecialization === 'all' || doc.specialization === selectedSpecialization
+        const filteredDocs = dummyDoctors.filter(
+          (doc) =>
+            selectedSpecialization === "all" ||
+            doc.specialization === selectedSpecialization
         );
-        
+
         // Sort doctors based on selected criteria
         const sortedDocs = [...filteredDocs].sort((a, b) => {
           switch (sortBy) {
-            case 'rating':
+            case "rating":
               return b.averageRating - a.averageRating;
-            case 'experience':
+            case "experience":
               return b.experience - a.experience;
-            case 'fees':
+            case "fees":
               return a.serviceTiers[0].price - b.serviceTiers[0].price;
-            case 'response':
+            case "response":
               return b.responseRate - a.responseRate;
             default:
               return 0;
           }
         });
-        
+
         setDoctors(sortedDocs);
         setLoading(false);
       }, 500); // Add a small delay to simulate network request
@@ -513,15 +635,19 @@ const Consultation = () => {
     setSelectedDoctor(null);
   };
 
-  const filteredDoctors = Array.isArray(doctors) ? doctors.filter((doctor) => {
-    const searchString = searchTerm.toLowerCase();
-    return (
-      doctor.firstName.toLowerCase().includes(searchString) ||
-      doctor.lastName.toLowerCase().includes(searchString) ||
-      doctor.specialization.toLowerCase().includes(searchString) ||
-      doctor.expertise.some((exp) => exp.toLowerCase().includes(searchString))
-    );
-  }) : [];
+  const filteredDoctors = Array.isArray(doctors)
+    ? doctors.filter((doctor) => {
+        const searchString = searchTerm.toLowerCase();
+        return (
+          doctor.firstName.toLowerCase().includes(searchString) ||
+          doctor.lastName.toLowerCase().includes(searchString) ||
+          doctor.specialization.toLowerCase().includes(searchString) ||
+          doctor.expertise.some((exp) =>
+            exp.toLowerCase().includes(searchString)
+          )
+        );
+      })
+    : [];
 
   return (
     <MainLayout>
@@ -529,8 +655,12 @@ const Consultation = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Find and Consult Top Doctors</h1>
-            <p className="text-muted-foreground mt-2">Connect with the best healthcare professionals</p>
+            <h1 className="text-3xl font-bold text-foreground">
+              Find and Consult Top Doctors
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Connect with the best healthcare professionals
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" className="flex items-center gap-2 h-10">
@@ -551,51 +681,53 @@ const Consultation = () => {
           </div>
         </div>
 
-      {/* Search and Filter Section */}
+        {/* Search and Filter Section */}
         <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Input
+            <div className="flex-1">
+              <div className="relative">
+                <Input
                   placeholder="Search by doctor name, specialization, or expertise..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 h-12 text-base"
-            />
+                />
                 <Search className="absolute left-3 top-4 h-4 w-4 text-muted-foreground" />
-          </div>
-        </div>
-        <Select
-          value={selectedSpecialization}
-          onValueChange={setSelectedSpecialization}
-        >
+              </div>
+            </div>
+            <Select
+              value={selectedSpecialization}
+              onValueChange={setSelectedSpecialization}
+            >
               <SelectTrigger className="w-[250px] h-12">
                 <SelectValue placeholder="Select Specialization" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Specializations</SelectItem>
-            {specializations.map((spec) => (
-              <SelectItem key={spec} value={spec}>
-                {spec}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Specializations</SelectItem>
+                {specializations.map((spec) => (
+                  <SelectItem key={spec} value={spec}>
+                    {spec}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-      </div>
+        </div>
 
-      {/* Doctors List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
+        {/* Doctors List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading ? (
             <div className="col-span-full text-center py-8">
               <p className="text-muted-foreground">Loading doctors...</p>
             </div>
-        ) : filteredDoctors.length === 0 ? (
+          ) : filteredDoctors.length === 0 ? (
             <div className="col-span-full text-center py-8">
-              <p className="text-muted-foreground">No doctors found matching your criteria.</p>
+              <p className="text-muted-foreground">
+                No doctors found matching your criteria.
+              </p>
             </div>
-        ) : (
-          filteredDoctors.map((doctor) => (
+          ) : (
+            filteredDoctors.map((doctor) => (
               <div key={doctor._id} className="relative">
                 {selectedDoctor === doctor._id ? (
                   // Simplified Detailed View
@@ -614,73 +746,108 @@ const Consultation = () => {
                           {/* Doctor Header */}
                           <div className="flex items-start gap-6 mb-6">
                             <div className="relative">
-                <img
-                  src={doctor.profileImage || "/default-doctor.png"}
-                  alt={`${doctor.firstName} ${doctor.lastName}`}
+                              <img
+                                src={
+                                  doctor.profileImage || "/default-doctor.png"
+                                }
+                                alt={`${doctor.firstName} ${doctor.lastName}`}
                                 className="w-24 h-24 rounded-full object-cover border-4 border-background shadow-md"
                               />
-                              <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-4 border-background ${
-                                doctor.availability.status === "Available" ? "bg-green-500" :
-                                doctor.availability.status === "Busy" ? "bg-red-500" :
-                                "bg-yellow-500"
-                              }`} />
+                              <div
+                                className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-4 border-background ${
+                                  doctor.availability.status === "Available"
+                                    ? "bg-green-500"
+                                    : doctor.availability.status === "Busy"
+                                    ? "bg-red-500"
+                                    : "bg-yellow-500"
+                                }`}
+                              />
                             </div>
-                <div className="flex-1">
+                            <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <h2 className="text-2xl font-semibold text-foreground">
-                      Dr. {doctor.firstName} {doctor.lastName}
+                                  Dr. {doctor.firstName} {doctor.lastName}
                                 </h2>
-                    {doctor.isVerified && (
+                                {doctor.isVerified && (
                                   <CheckCircle className="h-5 w-5 text-blue-500 fill-current" />
-                    )}
-                  </div>
-                              <p className="text-lg text-muted-foreground">{doctor.specialization}</p>
+                                )}
+                              </div>
+                              <p className="text-lg text-muted-foreground">
+                                {doctor.specialization}
+                              </p>
                               <div className="flex items-center gap-3 mt-2">
                                 <div className="flex items-center gap-1">
                                   <Star className="h-5 w-5 text-yellow-500 fill-current" />
-                                  <span className="font-medium">{doctor.averageRating.toFixed(1)}</span>
-                                  <span className="text-muted-foreground">({doctor.totalReviews} reviews)</span>
+                                  <span className="font-medium">
+                                    {doctor.averageRating.toFixed(1)}
+                                  </span>
+                                  <span className="text-muted-foreground">
+                                    ({doctor.totalReviews} reviews)
+                                  </span>
                                 </div>
                                 {doctor.availability.instantBooking && (
-                                  <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                                  >
                                     Instant Booking
                                   </Badge>
                                 )}
-                  </div>
-                </div>
-              </div>
+                              </div>
+                            </div>
+                          </div>
 
                           {/* Quick Stats */}
                           <div className="grid grid-cols-3 gap-4 mb-6">
                             <div className="bg-muted/50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-semibold text-foreground">{doctor.experience}+ yrs</div>
-                              <div className="text-sm text-muted-foreground">Experience</div>
-                </div>
+                              <div className="text-lg font-semibold text-foreground">
+                                {doctor.experience}+ yrs
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                Experience
+                              </div>
+                            </div>
                             <div className="bg-muted/50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-semibold text-foreground">{doctor.successRate}%</div>
-                              <div className="text-sm text-muted-foreground">Success Rate</div>
-                </div>
+                              <div className="text-lg font-semibold text-foreground">
+                                {doctor.successRate}%
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                Success Rate
+                              </div>
+                            </div>
                             <div className="bg-muted/50 rounded-lg p-3 text-center">
-                              <div className="text-lg font-semibold text-foreground">{doctor.totalConsultations}+</div>
-                              <div className="text-sm text-muted-foreground">Consultations</div>
-                </div>
-              </div>
+                              <div className="text-lg font-semibold text-foreground">
+                                {doctor.totalConsultations}+
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                Consultations
+                              </div>
+                            </div>
+                          </div>
 
                           {/* Expertise */}
                           <div className="mb-6">
-                            <h3 className="text-sm font-medium text-foreground mb-2">Expertise</h3>
-                <div className="flex flex-wrap gap-2">
-                  {doctor.expertise.map((exp, index) => (
-                                <Badge key={index} variant="secondary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
-                      {exp}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+                            <h3 className="text-sm font-medium text-foreground mb-2">
+                              Expertise
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {doctor.expertise.map((exp, index) => (
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
+                                >
+                                  {exp}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
 
                           {/* Service Tiers */}
                           <div>
-                            <h3 className="text-sm font-medium text-foreground mb-4">Consultation Options</h3>
+                            <h3 className="text-sm font-medium text-foreground mb-4">
+                              Consultation Options
+                            </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               {doctor.serviceTiers.map((tier, index) => (
                                 <div
@@ -692,18 +859,33 @@ const Consultation = () => {
                                   }`}
                                 >
                                   <div className="flex justify-between items-center mb-2">
-                                    <h4 className="font-medium text-foreground">{tier.name}</h4>
-                                    <Badge variant="secondary" className="text-base font-semibold">
+                                    <h4 className="font-medium text-foreground">
+                                      {tier.name}
+                                    </h4>
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-base font-semibold"
+                                    >
                                       ₹{tier.price}
                                     </Badge>
                                   </div>
-                                  <p className="text-sm text-muted-foreground mb-3">{tier.duration} min consultation</p>
+                                  <p className="text-sm text-muted-foreground mb-3">
+                                    {tier.duration} min consultation
+                                  </p>
                                   <Button
                                     className="w-full"
-                                    variant={tier.name === "Premium" ? "default" : "outline"}
-                                    onClick={() => handleBookAppointment(doctor._id)}
+                                    variant={
+                                      tier.name === "Premium"
+                                        ? "default"
+                                        : "outline"
+                                    }
+                                    onClick={() =>
+                                      handleBookAppointment(doctor._id)
+                                    }
                                   >
-                                    {doctor.availability.instantBooking ? "Book Instantly" : "Book Now"}
+                                    {doctor.availability.instantBooking
+                                      ? "Book Instantly"
+                                      : "Book Now"}
                                   </Button>
                                 </div>
                               ))}
@@ -714,12 +896,20 @@ const Consultation = () => {
                           <div className="mt-6 p-4 bg-muted/50 rounded-lg">
                             <div className="flex items-center justify-between">
                               <div>
-                                <h3 className="font-medium text-foreground">Next Available</h3>
-                                <p className="text-sm text-muted-foreground">{doctor.availability.nextAvailableSlot}</p>
+                                <h3 className="font-medium text-foreground">
+                                  Next Available
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {doctor.availability.nextAvailableSlot}
+                                </p>
                               </div>
                               <div className="text-right">
-                                <h3 className="font-medium text-foreground">Response Time</h3>
-                                <p className="text-sm text-muted-foreground">{doctor.availability.responseTime}</p>
+                                <h3 className="font-medium text-foreground">
+                                  Response Time
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {doctor.availability.responseTime}
+                                </p>
                               </div>
                             </div>
                           </div>
@@ -729,18 +919,20 @@ const Consultation = () => {
                   </div>
                 ) : (
                   // Compact Card View
-                  <Card 
+                  <Card
                     className="cursor-pointer hover:shadow-md transition-all duration-200 overflow-hidden group relative bg-background"
                     onClick={() => handleDoctorClick(doctor._id)}
                   >
                     {/* Availability Indicator */}
-                    <div className={`absolute top-4 right-4 w-2 h-2 rounded-full ${
-                      doctor.availability.status === "Available" 
-                        ? "bg-green-500"
-                        : doctor.availability.status === "Busy"
-                        ? "bg-red-500"
-                        : "bg-yellow-500"
-                    }`} />
+                    <div
+                      className={`absolute top-4 right-4 w-2 h-2 rounded-full ${
+                        doctor.availability.status === "Available"
+                          ? "bg-green-500"
+                          : doctor.availability.status === "Busy"
+                          ? "bg-red-500"
+                          : "bg-yellow-500"
+                      }`}
+                    />
 
                     <div className="p-6">
                       {/* Doctor Info Section */}
@@ -763,11 +955,17 @@ const Consultation = () => {
                               Dr. {doctor.firstName} {doctor.lastName}
                             </h3>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">{doctor.specialization}</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {doctor.specialization}
+                          </p>
                           <div className="flex items-center gap-1.5">
                             <Star className="h-3.5 w-3.5 text-yellow-500 fill-current" />
-                            <span className="text-sm font-medium">{doctor.averageRating.toFixed(1)}</span>
-                            <span className="text-sm text-muted-foreground">({doctor.totalReviews})</span>
+                            <span className="text-sm font-medium">
+                              {doctor.averageRating.toFixed(1)}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              ({doctor.totalReviews})
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -787,24 +985,32 @@ const Consultation = () => {
                       {/* Bottom Section */}
                       <div className="flex items-center justify-between pt-4 border-t border-border">
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Next Available:</span>
-                          <p className="font-medium text-foreground">{doctor.availability.nextAvailableSlot}</p>
+                          <span className="text-muted-foreground">
+                            Next Available:
+                          </span>
+                          <p className="font-medium text-foreground">
+                            {doctor.availability.nextAvailableSlot}
+                          </p>
                         </div>
                         <div className="text-right">
-                          <span className="text-sm text-muted-foreground">Starts from</span>
-                          <p className="font-semibold text-foreground">₹{doctor.serviceTiers[0].price}</p>
+                          <span className="text-sm text-muted-foreground">
+                            Starts from
+                          </span>
+                          <p className="font-semibold text-foreground">
+                            ₹{doctor.serviceTiers[0].price}
+                          </p>
                         </div>
                       </div>
                     </div>
                   </Card>
                 )}
               </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
-    </div>
     </MainLayout>
   );
 };
 
-export default Consultation; 
+export default Consultation;

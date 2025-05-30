@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import {
   Form,
   FormControl,
@@ -42,19 +43,24 @@ const formSchema = z.object({
     .max(20, "First name must not exceed 20 characters"),
   lastName: z
     .string()
-    .min(3, "Last name must be at least 3 characters")
-    .max(20, "Last name must not exceed 20 characters"),
-  phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number"),
+    .min(3, "Last name must be at least 3 characters"),
+  phoneNumber: z
+    .string()
+    .refine((value) => {
+      try {
+        const phoneNumber = parsePhoneNumberFromString(value);
+        
+        return phoneNumber.isValid();
+      } catch {
+        return false;
+      }
+    }, "Invalid phone number"),
   dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
   gender: z.enum(["Male", "Female", "Other"], {
     required_error: "Please select a gender",
   }),
 });
 
-const handleRegister = async (values) => {
-  const data = axios.post("http://localhost:8000/users/register", values);
-  return data;
-};
 
 const Register = () => {
   const { toast } = useToast();
@@ -199,21 +205,32 @@ const Register = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-              <FormField
+                />
+                <FormField
                 control={form.control}
                 name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+1234567890" {...field} />
-                    </FormControl>
-                    <FormMessage />
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input
+                    placeholder="+91834567890"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (!value.startsWith("+")) {
+                      field.onChange(`+91${value}`);
+                      } else {
+                      field.onChange(value);
+                      }
+                    }}
+                    />
+                  </FormControl>
+                  <FormMessage />
                   </FormItem>
                 )}
-              />
-              <FormField
+                />
+                <FormField
                 control={form.control}
                 name="dateOfBirth"
                 render={({ field }) => (

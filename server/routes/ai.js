@@ -1,7 +1,7 @@
-import express from 'express';
-import Groq from 'groq-sdk';
-import auth from '../middleware/auth.js';
-import dotenv from 'dotenv';
+import express from "express";
+import Groq from "groq-sdk";
+import auth from "../middleware/auth.js";
+import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Load environment variables
@@ -11,7 +11,9 @@ const router = express.Router();
 
 // Initialize Groq client with explicit API key
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || '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'
+  apiKey:
+    process.env.GROQ_API_KEY ||
+    "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",
 });
 
 // Initialize Gemini AI
@@ -19,23 +21,33 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Verify API key is loaded
 if (!process.env.GROQ_API_KEY) {
-  console.warn('Warning: Using fallback GROQ_API_KEY. Please check your .env file.');
+  console.warn(
+    "Warning: Using fallback GROQ_API_KEY. Please check your .env file."
+  );
 }
 
 // Helper function to validate command response
 const validateCommandResponse = (result) => {
-  const requiredFields = ['intent', 'confidence', 'response'];
-  const missingFields = requiredFields.filter(field => !(field in result));
-  
+  const requiredFields = ["intent", "confidence", "response"];
+  const missingFields = requiredFields.filter((field) => !(field in result));
+
   if (missingFields.length > 0) {
-    throw new Error(`Invalid response format. Missing fields: ${missingFields.join(', ')}`);
+    throw new Error(
+      `Invalid response format. Missing fields: ${missingFields.join(", ")}`
+    );
   }
 
-  if (typeof result.confidence !== 'number' || result.confidence < 0 || result.confidence > 1) {
-    throw new Error('Invalid confidence value. Must be a number between 0 and 1');
+  if (
+    typeof result.confidence !== "number" ||
+    result.confidence < 0 ||
+    result.confidence > 1
+  ) {
+    throw new Error(
+      "Invalid confidence value. Must be a number between 0 and 1"
+    );
   }
 
-  if (!['navigation', 'query', 'action', 'system'].includes(result.intent)) {
+  if (!["navigation", "query", "action", "system"].includes(result.intent)) {
     throw new Error(`Invalid intent value: ${result.intent}`);
   }
 
@@ -43,28 +55,30 @@ const validateCommandResponse = (result) => {
 };
 
 // Process voice commands
-router.post('/process-command', auth, async (req, res) => {
+router.post("/process-command", auth, async (req, res) => {
   try {
     const { command, currentPath, userContext } = req.body;
 
     // Validate input
     if (!command) {
       return res.status(400).json({
-        error: 'Invalid Request',
-        details: 'No command provided. Please provide a voice command to process.'
+        error: "Invalid Request",
+        details:
+          "No command provided. Please provide a voice command to process.",
       });
     }
 
     if (command.length > 500) {
       return res.status(400).json({
-        error: 'Invalid Request',
-        details: 'Command is too long. Please keep commands under 500 characters.'
+        error: "Invalid Request",
+        details:
+          "Command is too long. Please keep commands under 500 characters.",
       });
     }
 
-    console.log('Processing command:', command);
-    console.log('Current path:', currentPath);
-    console.log('User context:', userContext);
+    console.log("Processing command:", command);
+    console.log("Current path:", currentPath);
+    console.log("User context:", userContext);
 
     const systemPrompt = `You are an AI assistant that processes voice commands for a health tracking application.
 Your task is to understand the user's intent and provide appropriate navigation or action responses.
@@ -167,7 +181,7 @@ Command: "${command}"
 Current Location: ${currentPath}
 User Context: ${JSON.stringify(userContext, null, 2)}
 
-Available Routes: ${userContext.availableRoutes.join(', ')}
+Available Routes: ${userContext.availableRoutes.join(", ")}
 
 Respond with a JSON object that includes:
 {
@@ -221,28 +235,33 @@ Examples:
         messages: [
           {
             role: "system",
-            content: systemPrompt
+            content: systemPrompt,
           },
           {
             role: "user",
-            content: userPrompt
-          }
+            content: userPrompt,
+          },
         ],
         model: "mixtral-8x7b-32768",
         temperature: 0.3,
-        max_tokens: 1000
+        max_tokens: 1000,
       });
 
       if (!completion.choices || !completion.choices[0]?.message?.content) {
-        throw new Error('Invalid or empty response from AI service');
+        throw new Error("Invalid or empty response from AI service");
       }
 
       let result;
       try {
         result = JSON.parse(completion.choices[0].message.content);
       } catch (parseError) {
-        console.error('Failed to parse AI response:', completion.choices[0].message.content);
-        throw new Error('Failed to parse AI response as JSON. The response was not in the expected format.');
+        console.error(
+          "Failed to parse AI response:",
+          completion.choices[0].message.content
+        );
+        throw new Error(
+          "Failed to parse AI response as JSON. The response was not in the expected format."
+        );
       }
 
       // Validate the response format
@@ -254,43 +273,41 @@ Examples:
       result.timestamp = new Date().toISOString();
       result.commandProcessed = command;
 
-      console.log('Processed result:', result);
+      console.log("Processed result:", result);
       res.json(result);
-
     } catch (aiError) {
-      console.error('AI Service Error:', aiError);
+      console.error("AI Service Error:", aiError);
       res.status(500).json({
-        error: 'AI Processing Error',
+        error: "AI Processing Error",
         details: aiError.message,
         command: command,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-
   } catch (error) {
-    console.error('Command Processing Error:', error);
-    
+    console.error("Command Processing Error:", error);
+
     // Determine the appropriate status code
     let statusCode = 500;
-    if (error.message.includes('Invalid Request')) {
+    if (error.message.includes("Invalid Request")) {
       statusCode = 400;
-    } else if (error.message.includes('authentication')) {
+    } else if (error.message.includes("authentication")) {
       statusCode = 401;
     }
 
     // Send detailed error response
     res.status(statusCode).json({
-      error: 'Command Processing Error',
+      error: "Command Processing Error",
       details: error.message,
       timestamp: new Date().toISOString(),
       command: req.body.command,
-      path: req.body.currentPath
+      path: req.body.currentPath,
     });
   }
 });
 
 // Get command suggestions
-router.get('/command-suggestions', auth, async (req, res) => {
+router.get("/command-suggestions", auth, async (req, res) => {
   try {
     const { context } = req.query;
 
@@ -326,44 +343,45 @@ Respond in JSON format:
       messages: [
         {
           role: "system",
-          content: "You are an AI assistant that helps users with voice commands in a health tracking application."
+          content:
+            "You are an AI assistant that helps users with voice commands in a health tracking application.",
         },
         {
           role: "user",
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
       model: "mixtral-8x7b-32768",
       temperature: 0.7,
-      max_tokens: 1000
+      max_tokens: 1000,
     });
 
     try {
       const suggestions = JSON.parse(completion.choices[0].message.content);
       res.json(suggestions);
     } catch (parseError) {
-      console.error('Error parsing suggestions:', parseError);
+      console.error("Error parsing suggestions:", parseError);
       res.status(500).json({
-        error: 'Failed to parse suggestions',
+        error: "Failed to parse suggestions",
         details: parseError.message,
-        rawResponse: completion.choices[0].message.content
+        rawResponse: completion.choices[0].message.content,
       });
     }
   } catch (error) {
-    console.error('Error generating suggestions:', error);
+    console.error("Error generating suggestions:", error);
     res.status(500).json({
-      error: 'Failed to generate command suggestions',
-      details: error.message
+      error: "Failed to generate command suggestions",
+      details: error.message,
     });
   }
 });
 
-router.post('/analyze-image', async (req, res) => {
+router.post("/analyze-image", async (req, res) => {
   try {
     const { image, language } = req.body;
 
     if (!image) {
-      return res.status(400).json({ error: 'No image provided' });
+      return res.status(400).json({ error: "No image provided" });
     }
 
     // Initialize the model
@@ -378,8 +396,10 @@ router.post('/analyze-image', async (req, res) => {
     };
 
     // Create prompt based on language
-    let prompt = "Analyze this medical or health-related image and provide a detailed but concise description. ";
-    prompt += "Focus on any visible symptoms, medical conditions, or health-related aspects. ";
+    let prompt =
+      "Analyze this medical or health-related image and provide a detailed but concise description. ";
+    prompt +=
+      "Focus on any visible symptoms, medical conditions, or health-related aspects. ";
     prompt += "Format the response in simple, easy-to-understand language.";
 
     // Generate content
@@ -388,10 +408,14 @@ router.post('/analyze-image', async (req, res) => {
     let description = response.text();
 
     // If language is not English, translate the response
-    if (language !== 'en') {
-      const translationModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+    if (language !== "en") {
+      const translationModel = genAI.getGenerativeModel({
+        model: "gemini-pro",
+      });
       const translationPrompt = `Translate the following text to ${language}:\n\n${description}`;
-      const translationResult = await translationModel.generateContent(translationPrompt);
+      const translationResult = await translationModel.generateContent(
+        translationPrompt
+      );
       description = (await translationResult.response).text();
     }
 
@@ -400,12 +424,12 @@ router.post('/analyze-image', async (req, res) => {
       language,
     });
   } catch (error) {
-    console.error('Image analysis error:', error);
-    res.status(500).json({ 
-      error: 'Failed to analyze image',
-      details: error.message 
+    console.error("Image analysis error:", error);
+    res.status(500).json({
+      error: "Failed to analyze image",
+      details: error.message,
     });
   }
 });
 
-export default router; 
+export default router;

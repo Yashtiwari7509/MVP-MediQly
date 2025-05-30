@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Calculator,
-  Apple,
-  Plus,
-  X,
-  Save,
-  List,
-} from "lucide-react";
+import { Calculator, Apple, Plus, X, Save, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,7 +29,12 @@ const foodCategories = [
       { name: "Rice (1 cup)", calories: 130, image: "🍚", quantity: 0 },
       { name: "Paneer Curry (100g)", calories: 265, image: "🍛", quantity: 0 },
       { name: "Samosa", calories: 260, image: "🔺", quantity: 0 },
-      { name: "Butter Chicken (150g)", calories: 290, image: "🍗", quantity: 0 },
+      {
+        name: "Butter Chicken (150g)",
+        calories: 290,
+        image: "🍗",
+        quantity: 0,
+      },
       { name: "Biryani (1 cup)", calories: 250, image: "🍛", quantity: 0 },
       { name: "Dosa", calories: 120, image: "🥞", quantity: 0 },
       { name: "Idli (2 pieces)", calories: 80, image: "⚪", quantity: 0 },
@@ -77,7 +75,12 @@ const foodCategories = [
       { name: "Bread Slice", calories: 80, image: "🍞", quantity: 0 },
       { name: "Milk (250ml)", calories: 120, image: "🥛", quantity: 0 },
       { name: "Yogurt (200g)", calories: 150, image: "🍶", quantity: 0 },
-      { name: "Chicken Breast (100g)", calories: 165, image: "🍗", quantity: 0 },
+      {
+        name: "Chicken Breast (100g)",
+        calories: 165,
+        image: "🍗",
+        quantity: 0,
+      },
       { name: "Fish (100g)", calories: 140, image: "🐟", quantity: 0 },
     ],
   },
@@ -101,7 +104,10 @@ const CalorieCalculator = () => {
     setSavedMeals(meals);
   }, []);
 
-  const totalCalories = selectedFoods.reduce((total, food) => total + (food.calories * food.quantity), 0);
+  const totalCalories = selectedFoods.reduce(
+    (total, food) => total + food.calories * food.quantity,
+    0
+  );
 
   const handleQuantityChange = (index: number, change: number) => {
     const newFoods = [...selectedFoods];
@@ -110,7 +116,7 @@ const CalorieCalculator = () => {
   };
 
   const addFoodItem = (food: FoodItem) => {
-    const existingFood = selectedFoods.find(f => f.name === food.name);
+    const existingFood = selectedFoods.find((f) => f.name === food.name);
     if (existingFood) {
       handleQuantityChange(selectedFoods.indexOf(existingFood), 1);
     } else {
@@ -168,7 +174,9 @@ const CalorieCalculator = () => {
               </DialogHeader>
               <div className="space-y-4 mt-4">
                 {savedMeals.length === 0 ? (
-                  <p className="text-center text-muted-foreground">No saved meals yet</p>
+                  <p className="text-center text-muted-foreground">
+                    No saved meals yet
+                  </p>
                 ) : (
                   savedMeals.map((meal, index) => (
                     <Card key={index} className="p-4 relative group">
@@ -182,11 +190,16 @@ const CalorieCalculator = () => {
                       </Button>
                       <div className="flex justify-between items-start mb-2 pr-8">
                         <h3 className="text-lg font-semibold">{meal.name}</h3>
-                        <Badge variant="secondary">{meal.totalCalories} cal</Badge>
+                        <Badge variant="secondary">
+                          {meal.totalCalories} cal
+                        </Badge>
                       </div>
                       <div className="space-y-2">
                         {meal.foods.map((food, foodIndex) => (
-                          <div key={foodIndex} className="flex items-center gap-2 text-sm">
+                          <div
+                            key={foodIndex}
+                            className="flex items-center gap-2 text-sm"
+                          >
                             <span>{food.image}</span>
                             <span className="flex-1">{food.name}</span>
                             <span className="text-muted-foreground">
@@ -224,8 +237,12 @@ const CalorieCalculator = () => {
                         <div className="flex items-center gap-2">
                           <span className="text-xl">{food.image}</span>
                           <div className="text-left">
-                            <div className="text-sm font-medium">{food.name}</div>
-                            <div className="text-xs text-muted-foreground">{food.calories} cal</div>
+                            <div className="text-sm font-medium">
+                              {food.name}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {food.calories} cal
+                            </div>
                           </div>
                         </div>
                         <Plus className="h-4 w-4 text-primary" />
@@ -246,7 +263,10 @@ const CalorieCalculator = () => {
 
             <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto mb-4">
               {selectedFoods.map((food, index) => (
-                <div key={index} className="flex items-center justify-between p-2 border rounded-lg hover:bg-primary/5">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-2 border rounded-lg hover:bg-primary/5"
+                >
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{food.image}</span>
                     <div>
@@ -285,11 +305,13 @@ const CalorieCalculator = () => {
             </div>
 
             <div className="pt-4 border-t space-y-4">
-              <div className="flex jusdtify-between items-center">
+              <div className="flex justify-between items-center">
                 <div className="text-lg font-semibold">Total Calories</div>
-                <div className="text-2xl font-bold text-primary">{totalCalories}</div>
+                <div className="text-2xl font-bold text-primary">
+                  {totalCalories}
+                </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Input
                   placeholder="Enter meal name"
@@ -298,8 +320,8 @@ const CalorieCalculator = () => {
                   className="w-full"
                 />
                 <div className="flex gap-2">
-                  <Button 
-                    className="w-full bg-primary hover:bg-primary/90 text-white shadow-lg py-6 text-lg font-semibold flex items-center justify-center gap-2 rounded-lg transition-all duration-200" 
+                  <Button
+                    className="w-full bg-primary hover:bg-primary/90 text-white shadow-lg py-6 text-lg font-semibold flex items-center justify-center gap-2 rounded-lg transition-all duration-200"
                     variant="default"
                     onClick={handleSaveMeal}
                     disabled={!mealName.trim() || selectedFoods.length === 0}
@@ -307,8 +329,8 @@ const CalorieCalculator = () => {
                     <Save className="h-5 w-5" />
                     Save Meal Plan
                   </Button>
-                  <Button 
-                    className="bg-destructive hover:bg-destructive/85 text-white shadow-lg py-6 text-lg font-semibold flex items-center justify-center gap-2 rounded-lg transition-all duration-200" 
+                  <Button
+                    className="bg-destructive hover:bg-destructive/85 text-white shadow-lg py-6 text-lg font-semibold flex items-center justify-center gap-2 rounded-lg transition-all duration-200"
                     variant="destructive"
                     onClick={() => {
                       setMealName("");
@@ -329,4 +351,4 @@ const CalorieCalculator = () => {
   );
 };
 
-export default CalorieCalculator; 
+export default CalorieCalculator;

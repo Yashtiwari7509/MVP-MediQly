@@ -25,12 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import MainLayout from "@/components/layout/MainLayout";
 import { useNavigate } from "react-router-dom";
@@ -125,9 +120,17 @@ const getPersonalizedSuggestions = (
   // Add personalized caloric suggestions
   const idealWeight = 22 * (height / 100) * (height / 100); // Using BMI 22 as target
   if (goal === "weight_loss" && weight > idealWeight) {
-    suggestions.push(`Target weight range: ${Math.round(idealWeight - 5)} to ${Math.round(idealWeight)} kg`);
+    suggestions.push(
+      `Target weight range: ${Math.round(idealWeight - 5)} to ${Math.round(
+        idealWeight
+      )} kg`
+    );
   } else if (goal === "weight_gain" && weight < idealWeight) {
-    suggestions.push(`Target weight range: ${Math.round(idealWeight)} to ${Math.round(idealWeight + 5)} kg`);
+    suggestions.push(
+      `Target weight range: ${Math.round(idealWeight)} to ${Math.round(
+        idealWeight + 5
+      )} kg`
+    );
   }
 
   return suggestions;
@@ -142,7 +145,8 @@ const dietPlans: Record<string, DietPlan> = {
         time: "7:00 AM",
         meal: "Breakfast",
         calories: 300,
-        description: "Oatmeal with berries, 1 scoop protein powder, and almonds",
+        description:
+          "Oatmeal with berries, 1 scoop protein powder, and almonds",
       },
       {
         time: "10:00 AM",
@@ -179,9 +183,9 @@ const dietPlans: Record<string, DietPlan> = {
       "Plan your meals ahead to avoid impulsive eating",
       "Include strength training to maintain muscle mass",
       "Track your food intake using a food diary or app",
-      "Allow yourself occasional treats to maintain motivation"
+      "Allow yourself occasional treats to maintain motivation",
     ],
-    suggestions: []
+    suggestions: [],
   },
   weight_gain: {
     type: "weight_gain",
@@ -203,7 +207,8 @@ const dietPlans: Record<string, DietPlan> = {
         time: "1:00 PM",
         meal: "Lunch",
         calories: 800,
-        description: "Brown rice, grilled chicken breast, sweet potatoes, and vegetables",
+        description:
+          "Brown rice, grilled chicken breast, sweet potatoes, and vegetables",
       },
       {
         time: "4:00 PM",
@@ -215,7 +220,8 @@ const dietPlans: Record<string, DietPlan> = {
         time: "7:00 PM",
         meal: "Dinner",
         calories: 800,
-        description: "Pasta with meat sauce, garlic bread, and mixed vegetables",
+        description:
+          "Pasta with meat sauce, garlic bread, and mixed vegetables",
       },
     ],
     tips: [
@@ -228,9 +234,9 @@ const dietPlans: Record<string, DietPlan> = {
       "Eat before bed to prevent muscle breakdown during sleep",
       "Track your progress with both scale weight and measurements",
       "Don't skip meals - set reminders if needed",
-      "Choose nutrient-dense foods over empty calories"
+      "Choose nutrient-dense foods over empty calories",
     ],
-    suggestions: []
+    suggestions: [],
   },
   maintenance: {
     type: "maintenance",
@@ -277,9 +283,9 @@ const dietPlans: Record<string, DietPlan> = {
       "Stay active with a mix of cardio and strength training",
       "Plan for social events and holidays to maintain balance",
       "Get regular health check-ups to monitor overall wellness",
-      "Make sustainable food choices you can maintain long-term"
+      "Make sustainable food choices you can maintain long-term",
     ],
-    suggestions: []
+    suggestions: [],
   },
 };
 
@@ -305,7 +311,12 @@ const foodCategories = [
       { name: "Rice (1 cup)", calories: 130, image: "🍚", quantity: 0 },
       { name: "Paneer Curry (100g)", calories: 265, image: "🍛", quantity: 0 },
       { name: "Samosa", calories: 260, image: "🔺", quantity: 0 },
-      { name: "Butter Chicken (150g)", calories: 290, image: "🍗", quantity: 0 },
+      {
+        name: "Butter Chicken (150g)",
+        calories: 290,
+        image: "🍗",
+        quantity: 0,
+      },
       { name: "Biryani (1 cup)", calories: 250, image: "🍛", quantity: 0 },
       { name: "Dosa", calories: 120, image: "🥞", quantity: 0 },
       { name: "Idli (2 pieces)", calories: 80, image: "⚪", quantity: 0 },
@@ -346,7 +357,12 @@ const foodCategories = [
       { name: "Bread Slice", calories: 80, image: "🍞", quantity: 0 },
       { name: "Milk (250ml)", calories: 120, image: "🥛", quantity: 0 },
       { name: "Yogurt (200g)", calories: 150, image: "🍶", quantity: 0 },
-      { name: "Chicken Breast (100g)", calories: 165, image: "🍗", quantity: 0 },
+      {
+        name: "Chicken Breast (100g)",
+        calories: 165,
+        image: "🍗",
+        quantity: 0,
+      },
       { name: "Fish (100g)", calories: 140, image: "🐟", quantity: 0 },
     ],
   },
@@ -378,7 +394,7 @@ const Diet = () => {
       // Convert feet and inches to cm
       const feetNum = parseFloat(feet) || 0;
       const inchesNum = parseFloat(inches) || 0;
-      return (feetNum * 30.48) + (inchesNum * 2.54);
+      return feetNum * 30.48 + inchesNum * 2.54;
     }
   };
 
@@ -423,19 +439,28 @@ const Diet = () => {
         veryActive: 1.9,
       };
 
-      return Math.round(bmr * multipliers[activityLevel as keyof typeof multipliers]);
+      return Math.round(
+        bmr * multipliers[activityLevel as keyof typeof multipliers]
+      );
     }
     return null;
   };
 
-  const handlePlanChange = (type: "weight_loss" | "weight_gain" | "maintenance") => {
+  const handlePlanChange = (
+    type: "weight_loss" | "weight_gain" | "maintenance"
+  ) => {
     const weightNum = parseFloat(weight);
     const heightInCm = getHeightInCm();
     const bmiNum = weightNum / ((heightInCm / 100) * (heightInCm / 100));
-    
+
     const plan = { ...dietPlans[type] };
     if (weightNum && heightInCm) {
-      plan.suggestions = getPersonalizedSuggestions(bmiNum, weightNum, heightInCm, type);
+      plan.suggestions = getPersonalizedSuggestions(
+        bmiNum,
+        weightNum,
+        heightInCm,
+        type
+      );
       // Adjust daily calories based on TDEE
       const calculatedTDEE = calculateTDEE();
       if (calculatedTDEE) {
@@ -475,17 +500,24 @@ const Diet = () => {
                 </DialogHeader>
                 <div className="space-y-4 mt-4">
                   {savedMeals.length === 0 ? (
-                    <p className="text-center text-muted-foreground">No saved meals yet</p>
+                    <p className="text-center text-muted-foreground">
+                      No saved meals yet
+                    </p>
                   ) : (
                     savedMeals.map((meal, index) => (
                       <Card key={index} className="p-4">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="text-lg font-semibold">{meal.name}</h3>
-                          <Badge variant="secondary">{meal.totalCalories} cal</Badge>
+                          <Badge variant="secondary">
+                            {meal.totalCalories} cal
+                          </Badge>
                         </div>
                         <div className="space-y-2">
                           {meal.foods.map((food, foodIndex) => (
-                            <div key={foodIndex} className="flex items-center gap-2 text-sm">
+                            <div
+                              key={foodIndex}
+                              className="flex items-center gap-2 text-sm"
+                            >
                               <span>{food.image}</span>
                               <span className="flex-1">{food.name}</span>
                               <span className="text-muted-foreground">
@@ -523,7 +555,10 @@ const Diet = () => {
             </h2>
             <div className="space-y-5">
               <div className="group">
-                <Label htmlFor="weight" className="text-sm font-medium mb-1.5 block">
+                <Label
+                  htmlFor="weight"
+                  className="text-sm font-medium mb-1.5 block"
+                >
                   Weight (kg)
                 </Label>
                 <Input
@@ -580,7 +615,10 @@ const Diet = () => {
                 )}
               </div>
               <div className="group">
-                <Label htmlFor="age" className="text-sm font-medium mb-1.5 block">
+                <Label
+                  htmlFor="age"
+                  className="text-sm font-medium mb-1.5 block"
+                >
                   Age
                 </Label>
                 <Input
@@ -593,7 +631,9 @@ const Diet = () => {
                 />
               </div>
               <div className="group">
-                <Label className="text-sm font-medium mb-1.5 block">Gender</Label>
+                <Label className="text-sm font-medium mb-1.5 block">
+                  Gender
+                </Label>
                 <Select value={gender} onValueChange={setGender}>
                   <SelectTrigger className="w-full focus:ring-2 focus:ring-primary/20">
                     <SelectValue placeholder="Select gender" />
@@ -605,17 +645,29 @@ const Diet = () => {
                 </Select>
               </div>
               <div className="group">
-                <Label className="text-sm font-medium mb-1.5 block">Activity Level</Label>
+                <Label className="text-sm font-medium mb-1.5 block">
+                  Activity Level
+                </Label>
                 <Select value={activityLevel} onValueChange={setActivityLevel}>
                   <SelectTrigger className="w-full focus:ring-2 focus:ring-primary/20">
                     <SelectValue placeholder="Select activity level" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="sedentary">Sedentary (little or no exercise)</SelectItem>
-                    <SelectItem value="light">Light (exercise 1-3 times/week)</SelectItem>
-                    <SelectItem value="moderate">Moderate (exercise 3-5 times/week)</SelectItem>
-                    <SelectItem value="active">Active (exercise 6-7 times/week)</SelectItem>
-                    <SelectItem value="veryActive">Very Active (hard exercise daily)</SelectItem>
+                    <SelectItem value="sedentary">
+                      Sedentary (little or no exercise)
+                    </SelectItem>
+                    <SelectItem value="light">
+                      Light (exercise 1-3 times/week)
+                    </SelectItem>
+                    <SelectItem value="moderate">
+                      Moderate (exercise 3-5 times/week)
+                    </SelectItem>
+                    <SelectItem value="active">
+                      Active (exercise 6-7 times/week)
+                    </SelectItem>
+                    <SelectItem value="veryActive">
+                      Very Active (hard exercise daily)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -626,8 +678,12 @@ const Diet = () => {
                 <div className="p-5 bg-primary/5 rounded-xl border border-primary/10 hover:border-primary/20 transition-colors">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground font-medium">Your BMI</p>
-                      <p className="text-3xl font-bold text-primary mt-1">{bmi}</p>
+                      <p className="text-sm text-muted-foreground font-medium">
+                        Your BMI
+                      </p>
+                      <p className="text-3xl font-bold text-primary mt-1">
+                        {bmi}
+                      </p>
                     </div>
                     <Badge className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm py-1.5">
                       {getBMICategory(parseFloat(bmi))}
@@ -635,7 +691,9 @@ const Diet = () => {
                   </div>
                 </div>
                 <div className="p-5 bg-primary/5 rounded-xl border border-primary/10 hover:border-primary/20 transition-colors">
-                  <p className="text-sm text-muted-foreground font-medium">Daily Calorie Needs (TDEE)</p>
+                  <p className="text-sm text-muted-foreground font-medium">
+                    Daily Calorie Needs (TDEE)
+                  </p>
                   <div className="flex items-baseline gap-2 mt-1">
                     <p className="text-3xl font-bold text-primary">{tdee}</p>
                     <span className="text-muted-foreground">calories</span>
@@ -653,18 +711,31 @@ const Diet = () => {
             <Tabs
               defaultValue="maintenance"
               className="w-full"
-              onValueChange={(value) => handlePlanChange(value as "weight_loss" | "weight_gain" | "maintenance")}
+              onValueChange={(value) =>
+                handlePlanChange(
+                  value as "weight_loss" | "weight_gain" | "maintenance"
+                )
+              }
             >
               <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="weight_loss" className="flex items-center gap-2 data-[state=active]:bg-primary/20">
+                <TabsTrigger
+                  value="weight_loss"
+                  className="flex items-center gap-2 data-[state=active]:bg-primary/20"
+                >
                   <TrendingDown className="h-4 w-4" />
                   Loss
                 </TabsTrigger>
-                <TabsTrigger value="maintenance" className="flex items-center gap-2 data-[state=active]:bg-primary/20">
+                <TabsTrigger
+                  value="maintenance"
+                  className="flex items-center gap-2 data-[state=active]:bg-primary/20"
+                >
                   <Minus className="h-4 w-4" />
                   Maintain
                 </TabsTrigger>
-                <TabsTrigger value="weight_gain" className="flex items-center gap-2 data-[state=active]:bg-primary/20">
+                <TabsTrigger
+                  value="weight_gain"
+                  className="flex items-center gap-2 data-[state=active]:bg-primary/20"
+                >
                   <TrendingUp className="h-4 w-4" />
                   Gain
                 </TabsTrigger>
@@ -688,13 +759,20 @@ const Diet = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-primary/60 group-hover:text-primary transition-colors" />
-                        <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{meal.time}</span>
+                        <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                          {meal.time}
+                        </span>
                       </div>
-                      <Badge variant="outline" className="bg-background group-hover:bg-primary/10 transition-colors">
+                      <Badge
+                        variant="outline"
+                        className="bg-background group-hover:bg-primary/10 transition-colors"
+                      >
                         {meal.calories} cal
                       </Badge>
                     </div>
-                    <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">{meal.meal}</h4>
+                    <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                      {meal.meal}
+                    </h4>
                     <p className="text-sm text-muted-foreground mt-1 group-hover:text-foreground/80 transition-colors">
                       {meal.description}
                     </p>
@@ -709,12 +787,17 @@ const Diet = () => {
                     Personalized Suggestions
                   </h3>
                   <ul className="space-y-3">
-                    {dietPlans[selectedPlan]?.suggestions.map((suggestion, index) => (
-                      <li key={index} className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-primary/5">
-                        <Info className="h-4 w-4 text-primary shrink-0" />
-                        {suggestion}
-                      </li>
-                    ))}
+                    {dietPlans[selectedPlan]?.suggestions.map(
+                      (suggestion, index) => (
+                        <li
+                          key={index}
+                          className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-primary/5"
+                        >
+                          <Info className="h-4 w-4 text-primary shrink-0" />
+                          {suggestion}
+                        </li>
+                      )
+                    )}
                   </ul>
                 </div>
               )}
@@ -728,19 +811,26 @@ const Diet = () => {
                 Diet Tips
               </h2>
             </div>
-            
+
             <div className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
-                {selectedPlan && dietPlans[selectedPlan]?.tips.map((tip, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-primary/5">
-                    <div className="mt-1">
-                      <Badge variant="outline" className="w-6 h-6 flex items-center justify-center rounded-full">
-                        {index + 1}
-                      </Badge>
+                {selectedPlan &&
+                  dietPlans[selectedPlan]?.tips.map((tip, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 p-3 rounded-lg bg-primary/5"
+                    >
+                      <div className="mt-1">
+                        <Badge
+                          variant="outline"
+                          className="w-6 h-6 flex items-center justify-center rounded-full"
+                        >
+                          {index + 1}
+                        </Badge>
+                      </div>
+                      <p className="text-sm">{tip}</p>
                     </div>
-                    <p className="text-sm">{tip}</p>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </Card>
@@ -750,4 +840,4 @@ const Diet = () => {
   );
 };
 
-export default Diet; 
+export default Diet;

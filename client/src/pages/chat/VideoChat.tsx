@@ -1,27 +1,22 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Phone, Video, Send, UserCheck, User2, Loader2 } from "lucide-react";
+import { Phone, Video, Send, UserCheck, User2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/auth/AuthProvider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import io from "socket.io-client";
 import api from "@/utils/api";
 import { doctorProfileProps, UserProps } from "@/lib/user.type";
-import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
-import { ZIM } from "zego-zim-web";
-import { randomID } from "@/lib/utils";
+import { useVideoCall } from "@/hooks/useVideoCall";
+import { VideoCallDialog } from "@/components/video/VideoCallDialog";
 import { useSocket } from "@/context/SocketContext";
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8000";
 
 // Define types
 interface User {
@@ -72,7 +67,6 @@ interface Conversation {
 }
 
 const Chat = () => {
-  const { socket } = useSocket();
   const queryClient = useQueryClient();
   const { currentUser, currentDoctor, userType } = useAuth();
   const [selectedRecipient, setSelectedRecipient] = useState<
@@ -83,19 +77,27 @@ const Chat = () => {
     useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [isVideoCall, setIsVideoCall] = useState(false);
   const { toast } = useToast();
+  // const socketRef = useRef<any>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
-  const videoContainerRef = useRef<HTMLDivElement>(null);
-  const [zegoCloud, setZegoCloud] = useState<any>(null);
-
-  // Get doctorId and instant flag from URL
-  const searchParams = new URLSearchParams(window.location.search);
-  const doctorIdFromUrl = searchParams.get('doctorId');
-  const isInstantConsultation = searchParams.get('instant') === 'true';
+  const { socket } = useSocket();
 
   // Get current user ID and type
   const currentId = userType === "user" ? currentUser?._id : currentDoctor?._id;
+  console.log(currentId, "getting current ID");
+
+  // Initialize video call hook with existing socket
+  const {
+    callState,
+    localVideoRef,
+    remoteVideoRef,
+    initiateCall,
+    acceptCall,
+    rejectCall,
+    endCall,
+    toggleVideo,
+    toggleAudio,
+  } = useVideoCall(currentId!, userType!, socket);
 
   // Fetch available doctors/users depending on user type
   const { data: availableUsers } = useQuery({
@@ -109,168 +111,9 @@ const Chat = () => {
     enabled: !!currentId,
   });
 
-  // Auto-select doctor from URL if present
-  useEffect(() => {
-    if (doctorIdFromUrl && availableUsers) {
-      const doctor = availableUsers.find((user: Doctor) => user._id === doctorIdFromUrl);
-      if (doctor) {
-        setSelectedRecipient(doctor);
-        
-        // If it's an instant consultation, show welcome message
-        if (isInstantConsultation && !messages.length) {
-          const welcomeMessage: Message = {
-            _id: randomID(10),
-            text: `Hello! I'm Dr. ${doctor.firstName} ${doctor.lastName}. How can I help you today?`,
-            sender: {
-              id: doctor._id,
-              type: "doctor" as const
-            },
-            receiver: {
-              id: currentId || "",
-              type: "user" as const
-            },
-            read: false,
-            createdAt: new Date().toISOString()
-          };
-          setMessages([welcomeMessage]);
-        }
-      }
-    }
-  }, [doctorIdFromUrl, availableUsers, isInstantConsultation]);
-
-  // Initialize ZegoCloud
-  useEffect(() => {
-    const initZegoCloud = async () => {
-      const appID = 263201994; // Replace with your ZegoCloud App ID
-      const serverSecret = "6bb43443414d42bd8b1ae4a008f3e721"; // Replace with your Server Secret
-
-      const userID = currentId || randomID(5);
-      const userName = currentDoctor
-        ? `${currentDoctor.firstName} ${currentDoctor.lastName}`
-        : currentUser
-        ? `${currentUser.firstName} ${currentUser.lastName}`
-        : `User_${randomID(5)}`;
-
-      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-        appID,
-        serverSecret,
-        null,
-        userID,
-        userName
-      );
-
-      const zp = ZegoUIKitPrebuilt.create(kitToken);
-      zp.addPlugins({ ZIM });
-
-      // Set up call invitation handlers
-      zp.setCallInvitationConfig({
-        onIncomingCallReceived: (callID, caller) => {
-          toast({
-            title: "Incoming Call",
-            description: `${caller.userName} is calling...`,
-            duration: 3000,
-          });
-        },
-        onIncomingCallCanceled: (callID, caller) => {
-          toast({
-            title: "Call Canceled",
-            description: `${caller.userName} canceled the call`,
-            duration: 3000,
-          });
-        },
-        onOutgoingCallAccepted: (callID, callee) => {
-          toast({
-            title: "Call Accepted",
-            description: `${callee.userName} accepted the call`,
-            duration: 3000,
-          });
-        },
-        onOutgoingCallRejected: (callID, callee) => {
-          toast({
-            title: "Call Rejected",
-            description: `${callee.userName} rejected the call`,
-            duration: 3000,
-          });
-        },
-        onCallInvitationEnded: (reason, data) => {
-          setIsVideoCall(false);
-          toast({
-            title: "Call Ended",
-            description: `The call has ended`,
-            duration: 3000,
-          });
-        },
-      });
-
-      setZegoCloud(zp);
-    };
-
-    if (currentId) {
-      initZegoCloud();
-    }
-
-    return () => {
-      if (zegoCloud) {
-        zegoCloud.destroy();
-      }
-    };
-  }, [currentId, currentUser, currentDoctor]);
-
-  // Initialize socket listeners
-  useEffect(() => {
-    if (!socket || !currentId) return;
-
-    // Listen for new messages
-    socket.on("new-message", (data) => {
-      // If the message is for the current conversation, add it to messages
-      if (
-        currentConversation &&
-        data.conversationId === currentConversation._id
-      ) {
-        setMessages((prev) => [...prev, data.message]);
-      }
-
-      // Update conversations list
-      fetchConversations();
-    });
-
-    // Listen for message notifications
-    socket.on("message-notification", (data) => {
-      toast({
-        title: "New Message",
-        description: `You have a new message in conversation ${
-          userType === "user" ? "with Doctor" : "from User"
-        }`,
-      });
-    });
-
-    // Listen for user status changes
-    socket.on("user-status-change", (data) => {
-      // Update user status in the list
-      queryClient.invalidateQueries({ queryKey: ["available-users"] });
-      
-      // Update selected recipient status if it matches
-      if (selectedRecipient && selectedRecipient._id === data.userId) {
-        setSelectedRecipient((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            isOnline: data.isOnline
-          };
-        });
-      }
-    });
-
-    return () => {
-      socket.off("new-message");
-      socket.off("message-notification");
-      socket.off("user-status-change");
-    };
-  }, [socket, currentId, currentConversation, selectedRecipient]);
-
   // Fetch user conversations
   const fetchConversations = () => {
-    if (!socket || !currentId) return;
+    if (!currentId) return;
 
     socket.emit("get-conversations", { userId: currentId });
     socket.on("user-conversations", (data) => {
@@ -287,7 +130,7 @@ const Chat = () => {
 
   // Fetch chat history when a recipient is selected
   useEffect(() => {
-    if (!socket || !selectedRecipient || !currentId) return;
+    if (!selectedRecipient || !currentId) return;
 
     // Find existing conversation or create new one
     const recipientId = selectedRecipient._id;
@@ -318,11 +161,7 @@ const Chat = () => {
       setCurrentConversation(null);
       setMessages([]);
     }
-
-    return () => {
-      socket.off("chat-history");
-    };
-  }, [selectedRecipient, currentId, conversations, socket]);
+  }, [selectedRecipient, currentId, conversations]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -331,7 +170,7 @@ const Chat = () => {
 
   // Send message handler
   const handleSendMessage = () => {
-    if (!socket || !newMessage.trim() || !selectedRecipient || !currentId) return;
+    if (!newMessage.trim() || !selectedRecipient || !currentId) return;
 
     const recipientId = selectedRecipient._id;
     const recipientType = userType === "user" ? "doctor" : "user";
@@ -352,89 +191,112 @@ const Chat = () => {
     setNewMessage("");
   };
 
-  // Start video call
-  const startVideoCall = async () => {
-    if (!selectedRecipient || !zegoCloud) return;
-
-    const roomID = `room_${randomID(5)}`;
-
-    try {
-      await zegoCloud.sendCallInvitation({
-        callees: [
-          {
-            userID: selectedRecipient._id,
-            userName: getRecipientName(selectedRecipient),
-          },
-        ],
-        callType: ZegoUIKitPrebuilt.InvitationTypeVideoCall,
-        timeout: 60,
-      });
-
-      if (videoContainerRef.current) {
-        zegoCloud.joinRoom({
-          container: videoContainerRef.current,
-          sharedLinks: [
-            {
-              name: "Copy Link",
-              url: `${window.location.origin}/room?roomID=${roomID}`,
-            },
-          ],
-          scenario: {
-            mode: ZegoUIKitPrebuilt.OneONoneCall,
-          },
-          showPreJoinView: false,
-        });
-      }
-
-      setIsVideoCall(true);
-
-      toast({
-        title: "Starting video call",
-        description: `Connecting to ${getRecipientName(selectedRecipient)}...`,
-      });
-    } catch (error) {
+  // Start video call with enhanced logging
+  const startVideoCall = useCallback(async () => {
+    if (!selectedRecipient || !currentId) {
+      console.error("Cannot start call: missing recipient or current user ID");
       toast({
         title: "Error",
-        description: "Failed to start video call",
+        description: "Please select a recipient first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!socket || !socket.connected) {
+      console.error("Socket not connected");
+      toast({
+        title: "Connection Error",
+        description: "Not connected to server. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const targetUserType = userType === "user" ? "doctor" : "user";
+
+    console.log("Starting video call to:", {
+      recipientId: selectedRecipient._id,
+      targetUserType,
+      currentId,
+      socketConnected: socket.connected,
+    });
+
+    try {
+      await initiateCall(selectedRecipient._id, targetUserType);
+    } catch (error) {
+      console.error("Video call initiation failed:", error);
+      toast({
+        title: "Call Failed",
+        description:
+          error instanceof Error ? error.message : "Failed to start video call",
         variant: "destructive",
       });
     }
-  };
+  }, [selectedRecipient, currentId, userType, initiateCall, toast]);
 
-  // Start audio call
+  // 4. Enhanced error handling for audio calls
+  const startAudioCall = useCallback(async () => {
+    if (!selectedRecipient || !currentId) {
+      console.error("Cannot start call: missing recipient or current user ID");
+      toast({
+        title: "Error",
+        description: "Please select a recipient first",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  // End video call
-  const endVideoCall = () => {
-    setIsVideoCall(false);
-    toast({
-      title: "Call ended",
-      description: "The call has ended",
+    if (!socket || !socket.connected) {
+      console.error("Socket not connected");
+      toast({
+        title: "Connection Error",
+        description: "Not connected to server. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const targetUserType = userType === "user" ? "doctor" : "user";
+
+    console.log("Starting audio call to:", {
+      recipientId: selectedRecipient._id,
+      targetUserType,
+      currentId,
+      socketConnected: socket.connected,
     });
-  };
+
+    try {
+      await initiateCall(selectedRecipient._id, targetUserType);
+    } catch (error) {
+      console.error("Audio call initiation failed:", error);
+      toast({
+        title: "Call Failed",
+        description:
+          error instanceof Error ? error.message : "Failed to start audio call",
+        variant: "destructive",
+      });
+    }
+  }, [selectedRecipient, currentId, userType, initiateCall, toast]);
 
   // Helper function to get recipient name
   const getRecipientName = (recipient: User | Doctor) => {
     return `${recipient.firstName} ${recipient.lastName}`;
   };
 
+  // 2. Fix the video call initialization condition
+  const isVideoCallOpen = useMemo(() => {
+    return (
+      callState.isInCall || callState.isInitiating || callState.isReceiving
+    );
+  }, [callState.isInCall, callState.isInitiating, callState.isReceiving]);
+
   return (
     <MainLayout>
-      <div className="container mx-auto animate-in">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">
-            {isInstantConsultation ? 'Instant Consultation' : 'Chat with Doctors'}
-          </h1>
-          {selectedRecipient && (
-            <div className="flex items-center gap-2">
-              <Badge variant={selectedRecipient.isOnline ? "default" : "secondary"}>
-                {selectedRecipient.isOnline ? "Online" : "Offline"}
-              </Badge>
-              {isInstantConsultation && (
-                <Badge variant="default">Instant Consultation</Badge>
-              )}
-            </div>
-          )}
-        </div>
+      <div className="container mx-auto animate-in p-0">
+        <h1 className="mb-6 text-2xl font-bold">
+          Chat with {userType === "user" ? "Doctors" : "Patients"}
+        </h1>
 
         <div className="grid gap-6 md:grid-cols-[300px_1fr]">
           {/* Available Users/Doctors List */}
@@ -504,11 +366,11 @@ const Chat = () => {
                                 "No messages yet"}
                             </p>
                           </div>
-                          {otherParticipant?.unreadCount > 0 && (
+                          {/* {otherParticipant?.unreadCount > 0 && (
                             <Badge variant="destructive">
                               {otherParticipant.unreadCount}
                             </Badge>
-                          )}
+                          )} */}
                         </div>
                       );
                     })}
@@ -519,54 +381,54 @@ const Chat = () => {
                 <h3 className="p-2 text-sm font-medium text-muted-foreground">
                   All {userType === "user" ? "Doctors" : "Users"}
                 </h3>
-                {availableUsers?.data?.map(
-                  (recipient: doctorProfileProps ) => (
-                    <div
-                      key={recipient._id}
-                      className={`flex cursor-pointer items-center gap-3 border-b p-4 transition-colors hover:bg-accent ${
-                        selectedRecipient?._id === recipient._id
-                          ? "bg-accent"
-                          : ""
-                      }`}
-                      onClick={() => setSelectedRecipient({ 
-                        ...recipient, 
-                        _id: recipient._id, 
-                        isOnline: recipient.isOnline 
-                      })}
-                    >
-                      <div className="relative">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage
-                            src={`https://i.pravatar.cc/150?img=${recipient._id}`}
-                          />
-                          <AvatarFallback>
-                            {recipient.firstName[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span
-                          className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background ${
-                            recipient.isOnline ? "bg-green-500" : "bg-zinc-500"
-                          }`}
+                {availableUsers?.data?.map((recipient: doctorProfileProps) => (
+                  <div
+                    key={recipient._id}
+                    className={`flex cursor-pointer items-center gap-3 border-b p-4 transition-colors hover:bg-accent ${
+                      selectedRecipient?._id === recipient._id
+                        ? "bg-accent"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setSelectedRecipient({
+                        ...recipient,
+                        _id: recipient._id,
+                        isOnline: true,
+                      })
+                    }
+                  >
+                    <div className="relative">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={`https://i.pravatar.cc/150?img=${recipient._id}`}
                         />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">
-                          {recipient.firstName + " " + recipient.lastName}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {userType === "user" && "specialization" in recipient
-                            ? recipient.specialization
-                            : ""}
-                        </p>
-                      </div>
-                      <Badge
-                        variant={recipient.isOnline ? "default" : "secondary"}
-                      >
-                        {recipient.isOnline ? "active" : "offline"}
-                      </Badge>
+                        <AvatarFallback>
+                          {recipient.firstName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span
+                        className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background ${
+                          recipient.isOnline ? "bg-green-500" : "bg-zinc-500"
+                        }`}
+                      />
                     </div>
-                  )
-                )}
+                    <div className="flex-1">
+                      <p className="font-medium">
+                        {recipient.firstName + " " + recipient.lastName}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {userType === "user" && "specialization" in recipient
+                          ? recipient.specialization
+                          : ""}
+                      </p>
+                    </div>
+                    <Badge
+                      variant={recipient.isOnline ? "default" : "secondary"}
+                    >
+                      {recipient.isOnline ? "active" : "offline"}
+                    </Badge>
+                  </div>
+                ))}
               </ScrollArea>
             </CardContent>
           </Card>
@@ -602,6 +464,8 @@ const Chat = () => {
                       <Button
                         variant="outline"
                         size="icon"
+                        onClick={startAudioCall}
+                        disabled={isVideoCallOpen}
                       >
                         <Phone className="h-4 w-4" />
                       </Button>
@@ -609,6 +473,7 @@ const Chat = () => {
                         variant="outline"
                         size="icon"
                         onClick={startVideoCall}
+                        disabled={isVideoCallOpen}
                       >
                         <Video className="h-4 w-4" />
                       </Button>
@@ -684,9 +549,8 @@ const Chat = () => {
                 <div className="text-center">
                   <User2 className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
                   <p>
-                    {isInstantConsultation 
-                      ? "Connecting you with the doctor..."
-                      : `Select a ${userType === "user" ? "doctor" : "user"} to start chatting`}
+                    Select a {userType === "user" ? "doctor" : "user"} to start
+                    chatting
                   </p>
                 </div>
               </CardContent>
@@ -695,42 +559,17 @@ const Chat = () => {
         </div>
 
         {/* Video Call Dialog */}
-        <Dialog
-          open={isVideoCall}
-          onOpenChange={(open) => !open && endVideoCall()}
-        >
-          <DialogContent className="h-[80vh] max-w-4xl p-0 overflow-hidden">
-            <DialogHeader className="p-4 border-b">
-              <DialogTitle className="flex items-center justify-between">
-                <span>
-                  Video Call with{" "}
-                  {selectedRecipient ? getRecipientName(selectedRecipient) : ""}
-                </span>
-                <Button variant="destructive" size="sm" onClick={endVideoCall}>
-                  End Call
-                </Button>
-              </DialogTitle>
-            </DialogHeader>
-            <div
-              ref={videoContainerRef}
-              className="h-full w-full bg-black relative"
-            >
-              {/* ZegoCloud will render the video UI here */}
-              <div className="absolute inset-0 flex items-center justify-center text-white">
-                <div className="text-center">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                  <p>
-                    Connecting to{" "}
-                    {selectedRecipient
-                      ? getRecipientName(selectedRecipient)
-                      : ""}
-                    ...
-                  </p>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <VideoCallDialog
+          isOpen={isVideoCallOpen}
+          callState={callState}
+          localVideoRef={localVideoRef}
+          remoteVideoRef={remoteVideoRef}
+          onEndCall={endCall}
+          onToggleVideo={toggleVideo}
+          onToggleAudio={toggleAudio}
+          onAcceptCall={acceptCall}
+          onRejectCall={rejectCall}
+        />
       </div>
     </MainLayout>
   );
